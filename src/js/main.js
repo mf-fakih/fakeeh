@@ -132,7 +132,7 @@
        itu memakai properti CSS `translate`, terpisah dari `transform` yang
        ditulis GSAP — jadi keduanya bertumpuk dengan benar. JANGAN tambahkan
        xPercent/yPercent -50 di sini: hasilnya geser dua kali. */
-    gsap.set(heroChars, { yPercent: 118 });
+    gsap.set(heroChars, { yPercent: 105, rotate: 4, force3D: true });
     gsap.set(heroReveals, { opacity: 0, y: 22 });
     gsap.set($$('#hero [data-anim="pop"]'), { opacity: 0, y: 0, scale: 0.7 });
   }
@@ -141,18 +141,33 @@
     if (!hasGsap) return;
     const tl = gsap.timeline({
       onComplete: () => {
-        /* mask dibuka setelah huruf selesai masuk, supaya nanti huruf-hurufnya
-           bisa melebar ke samping tanpa kepotong maskernya */
-        gsap.set(heroWraps, { overflow: "visible" });
+        /* mask sudah terbuka penuh -> lepas, supaya huruf bisa melebar ke
+           samping saat di-scroll tanpa kepotong */
+        gsap.set(heroWraps, { clipPath: "none" });
       },
     });
 
+    /* power3.out + durasi panjang: gerakannya mengalir sampai akhir, tidak
+       "lompat" di awal seperti expo. Rotate kecil biar terasa organik. */
     tl.to(heroChars, {
       yPercent: 0,
-      duration: reduce ? 0.01 : 1.15,
-      ease: "expo.out",
-      stagger: reduce ? 0 : 0.045,
+      rotate: 0,
+      duration: reduce ? 0.01 : 1.6,
+      ease: "power4.out",
+      stagger: reduce ? 0 : 0.07,
     })
+      /* mask dibuka pelan: sisi atas naik, sisi bawah turun, mulai selagi
+         huruf masih meluncur masuk, jadi tidak ada patahan di akhir */
+      .to(
+        heroWraps,
+        {
+          clipPath: "inset(-45% -25% -45% -25%)",
+          duration: reduce ? 0.01 : 1.4,
+          ease: "power2.inOut",
+          stagger: reduce ? 0 : 0.07,
+        },
+        reduce ? 0 : 0.9,
+      )
       .to(
         $$('#hero [data-anim="up"]'),
         {
@@ -204,7 +219,6 @@
           loader.classList.add("is-done");
           loader.style.display = "none";
           if (lenis) lenis.start();
-          if (hasST) ScrollTrigger.refresh();
         },
       })
       .to(mark, { "--ink": "110%", duration: reduce ? 0.01 : 1.35, ease: "power2.inOut" }, 0)
@@ -221,6 +235,9 @@
         },
         0.1,
       )
+      /* refresh (berat: ukur ulang semua trigger) dijalankan selagi preloader
+         masih menutupi layar — kalau setelahnya, intro hero jadi tersendat */
+      .call(() => hasST && ScrollTrigger.refresh())
       .to(mark, { opacity: 0, y: -24, duration: reduce ? 0.01 : 0.5, ease: "power2.in" }, "+=0.15")
       .to(
         loader,
@@ -674,13 +691,14 @@
 
     if (footer && contactKids.length) {
       gsap.to(contactKids, {
-        yPercent: -9,
-        opacity: 0.45,
+        yPercent: -6,
+        opacity: 0.5,
         ease: "none",
+        /* footer-nya tidak setinggi layar, jadi selesainya di dasar halaman */
         scrollTrigger: {
           trigger: footer,
           start: "top bottom",
-          end: "top top",
+          end: "bottom bottom",
           scrub: true,
         },
       });

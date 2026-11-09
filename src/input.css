@@ -37,13 +37,23 @@
   --font-display: "Gondens DEMO", "Archivo Black", ui-sans-serif, sans-serif;
   --font-body: "Poppins", ui-sans-serif, system-ui, sans-serif;
 
-  --radius-hero: 50px;
+  --radius-hero: 0;
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @layer base {
+  *,
+  *::before,
+  *::after {
+    scrollbar-width: none;
+  }
+
+  *::-webkit-scrollbar {
+    display: none;
+  }
+
   /* Lenis mengambil alih smooth scroll, jadi scroll-behavior native dimatikan.
      Anchor dihandle di src/js/main.js (fallback ke native kalau JS mati). */
   html {
@@ -318,11 +328,11 @@
     width: min(100%, 1120px);
     padding: 6px 8px 6px clamp(16px, 2vw, 24px);
     border: 1px solid rgb(255 250 228 / 0.5);
-    border-radius: 999px;
+    border-radius: 0;
     background: rgb(255 237 164 / 0.88);
     -webkit-backdrop-filter: blur(14px) saturate(1.2);
     backdrop-filter: blur(14px) saturate(1.2);
-    box-shadow: 0 12px 34px rgb(70 17 19 / 0.18);
+    /* box-shadow: 0 12px 34px rgb(70 17 19 / 0.18); */
     color: var(--color-maroon);
   }
 
@@ -337,7 +347,7 @@
     align-items: center;
     gap: 10px;
     min-height: 44px;
-    border-radius: 999px;
+    border-radius: 0;
   }
 
   .topbar__logo {
@@ -374,7 +384,7 @@
     display: block;
     width: 26px;
     height: 2px;
-    border-radius: 2px;
+    border-radius: 0;
     background: currentColor;
     transition:
       transform 0.45s var(--ease-out-expo),
@@ -546,6 +556,15 @@
     font-size: min(23cqw, 44cqh);
   }
 
+  /* leading-[0.8] bikin kotak baris lebih pendek dari hurufnya, jadi mask
+     setinggi kotak itu memotong atas & bawah huruf. Mask-nya diganti
+     clip-path (bukan overflow) supaya main.js bisa MEMBUKANYA pelan-pelan:
+     bagian atas naik, bagian bawah turun, tanpa lompatan di akhir. */
+  .hero-title .sp-w {
+    overflow: visible;
+    clip-path: inset(0);
+  }
+
   /* garis tipis yang "digambar" saat masuk */
   .hero-rule {
     height: 1.5px;
@@ -568,7 +587,7 @@
     align-items: center;
     gap: 0.75em;
     padding: clamp(10px, 1.3vw, 15px) clamp(16px, 2vw, 24px);
-    border-radius: 999px;
+    border-radius: 0;
     background: var(--color-paper);
     color: var(--color-maroon);
     font-size: clamp(10px, 1.08vw, 12px);
@@ -648,7 +667,7 @@
   .media-mask {
     position: relative;
     overflow: clip;
-    border-radius: 25px;
+    border-radius: 0;
     background: var(--color-maroon);
   }
 
@@ -834,7 +853,7 @@
     width: min(86vw, 560px);
     height: min(100%, 540px);
     padding: clamp(14px, 1.8vw, 20px);
-    border-radius: 26px;
+    border-radius: 0;
     background: var(--color-cream);
     color: var(--color-maroon);
     will-change: transform;
@@ -848,7 +867,7 @@
     appearance: none;
     background: transparent;
     border: 0;
-    border-radius: 26px;
+    border-radius: 0;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
   }
@@ -881,7 +900,7 @@
     min-height: 0;
     margin: clamp(12px, 1.5vw, 18px) 0;
     padding: clamp(14px, 1.6vw, 20px);
-    border-radius: 16px;
+    border-radius: 0;
     overflow: clip;
     container-type: size;
     background: var(--color-maroon);
@@ -911,7 +930,7 @@
     content: "";
     width: 0.7em;
     height: 0.7em;
-    border-radius: 999px;
+    border-radius: 0;
     background: currentColor;
   }
 
@@ -936,7 +955,7 @@
     top: clamp(12px, 1.4vw, 18px);
     right: clamp(12px, 1.4vw, 18px);
     padding: 0.55em 1em;
-    border-radius: 999px;
+    border-radius: 0;
     background: var(--color-cream);
     color: var(--color-maroon);
     font-size: clamp(10px, 1vw, 12px);
@@ -1102,7 +1121,7 @@
     max-height: 100%;
     width: auto;
     height: auto;
-    border-radius: 6px;
+    border-radius: 0;
     box-shadow: 0 30px 80px rgb(0 0 0 / 0.45);
   }
 
@@ -1135,7 +1154,7 @@
     height: 44px;
     flex: none;
     border: 1px solid rgb(255 237 164 / 0.28);
-    border-radius: 999px;
+    border-radius: 0;
     background: transparent;
     color: var(--color-cream);
     cursor: pointer;
@@ -1285,7 +1304,7 @@
     z-index: 75;
     width: clamp(210px, 19vw, 290px);
     aspect-ratio: 4 / 5;
-    border-radius: 18px;
+    border-radius: 0;
     overflow: clip;
     pointer-events: none;
     opacity: 0;
@@ -1432,7 +1451,7 @@
     place-items: center;
     width: clamp(128px, 16vw, 200px);
     aspect-ratio: 1;
-    border-radius: 999px;
+    border-radius: 0;
     background: var(--color-cream);
     color: var(--color-ink);
     overflow: clip;
@@ -1448,7 +1467,7 @@
     position: absolute;
     inset: 0;
     background: var(--color-maroon);
-    border-radius: 999px;
+    border-radius: 0;
     transform: scale(0);
     transition: transform 0.6s var(--ease-out-expo);
   }
@@ -1535,8 +1554,8 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    min-height: 100svh;
-    border-radius: clamp(28px, 4vw, 50px) clamp(28px, 4vw, 50px) 0 0;
+    /* sengaja tidak full-screen: cuma menutup sebagian contact */
+    border-radius: 0;
     background: var(--color-cream);
     color: var(--color-maroon);
     overflow: clip;
@@ -1546,8 +1565,7 @@
     display: grid;
     align-items: center;
     gap: clamp(36px, 5vw, 72px);
-    /* atas dibuat lega: pil nav melayang di ~0–80px */
-    padding: clamp(110px, 11vw, 160px) clamp(18px, 3.4vw, 46px) clamp(32px, 4vw, 56px);
+    padding: clamp(48px, 6vw, 88px) clamp(18px, 3.4vw, 46px) clamp(32px, 4vw, 56px);
   }
 
   @media (min-width: 1024px) {
@@ -1560,7 +1578,7 @@
   .footer-title {
     margin-top: clamp(14px, 1.8vw, 24px);
     max-width: 12ch;
-    font-size: clamp(44px, 8vw, 132px);
+    font-size: clamp(40px, 6.4vw, 104px);
     font-weight: 900;
     line-height: 0.9;
     letter-spacing: -0.06em;
@@ -1646,7 +1664,7 @@
     place-items: center;
     width: clamp(48px, 4.4vw, 60px);
     aspect-ratio: 1;
-    border-radius: 999px;
+    border-radius: 0;
     border: 1.5px solid rgb(117 28 32 / 0.35);
     color: var(--color-maroon);
     transition:
