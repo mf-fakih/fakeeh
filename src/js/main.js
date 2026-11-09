@@ -471,12 +471,19 @@
       const speed = parseFloat(wrap.dataset.speed) || 0.5;
       const distance = track.scrollWidth / 2;
 
-      const tl = gsap.to(track, {
-        xPercent: -50,
-        ease: "none",
-        repeat: -1,
-        duration: Math.max(6, distance / (120 * speed)),
-      });
+      /* data-direction="-1" -> jalan ke kanan (dipakai pita kedua yang
+         menyilang, supaya dua pitanya berlawanan arah) */
+      const reverse = wrap.dataset.direction === "-1";
+      const tl = gsap.fromTo(
+        track,
+        { xPercent: reverse ? -50 : 0 },
+        {
+          xPercent: reverse ? 0 : -50,
+          ease: "none",
+          repeat: -1,
+          duration: Math.max(6, distance / (120 * speed)),
+        },
+      );
 
       marquees.push(tl);
 
@@ -646,14 +653,59 @@
     const toX = gsap.quickTo(preview, "x", { duration: 0.55, ease: "power3" });
     const toY = gsap.quickTo(preview, "y", { duration: 0.55, ease: "power3" });
     let current = -1;
+    let pointer = null; // posisi kursor terakhir (clientX/Y)
 
     gsap.set(preview, { scale: 0.82 });
 
-    workList.addEventListener(
+    /* BUG LAMA: posisi preview cuma di-update saat pointermove. Kalau baris
+       didatangi tanpa gerak mouse (mis. sambil scroll) atau saat pertama kali,
+       preview muncul di posisi lamanya — awalnya (0,0), alias pojok kiri atas.
+       Sekarang: saat muncul, preview LANGSUNG ditaruh di kursor (tanpa
+       meluncur), dan ikut dicek ulang tiap scroll. */
+    const follow = (x, y, snap) => {
+      const tx = x - preview.offsetWidth / 2;
+      const ty = y - preview.offsetHeight / 2;
+      if (snap) {
+        toX(tx, tx);
+        toY(ty, ty);
+      } else {
+        toX(tx);
+        toY(ty);
+      }
+    };
+
+    const hide = () => {
+      if (current === -1) return;
+      current = -1;
+      preview.classList.remove("is-on");
+      gsap.to(preview, { scale: 0.82, duration: 0.45, ease: "power2.out" });
+    };
+
+    const show = (row, snap) => {
+      const index = Number(row.dataset.work);
+      if (index === current) return;
+      const slide = slides[index];
+      /* project tanpa gambar preview -> jangan munculkan kotak kosong */
+      if (!slide) return hide();
+      const wasHidden = current === -1;
+      current = index;
+      if (pointer) follow(pointer.x, pointer.y, snap || wasHidden);
+      slides.forEach((s) => s.classList.toggle("is-on", s === slide));
+      preview.classList.add("is-on");
+      gsap.to(preview, {
+        scale: 1,
+        rotate: gsap.utils.random(-6, 6),
+        duration: 0.7,
+        ease: "expo.out",
+      });
+    };
+
+    addEventListener(
       "pointermove",
       (e) => {
-        toX(e.clientX - preview.offsetWidth / 2);
-        toY(e.clientY - preview.offsetHeight / 2);
+        if (e.pointerType !== "mouse") return;
+        pointer = { x: e.clientX, y: e.clientY };
+        if (current !== -1) follow(pointer.x, pointer.y, false);
       },
       { passive: true },
     );
@@ -661,25 +713,26 @@
     $$("[data-work]", workList).forEach((row) => {
       row.addEventListener("pointerenter", (e) => {
         if (e.pointerType !== "mouse") return;
-        const index = Number(row.dataset.work);
-        if (index === current) return;
-        current = index;
-        slides.forEach((slide, i) => slide.classList.toggle("is-on", i === index));
-        preview.classList.add("is-on");
-        gsap.to(preview, {
-          scale: 1,
-          rotate: gsap.utils.random(-6, 6),
-          duration: 0.7,
-          ease: "expo.out",
-        });
+        pointer = { x: e.clientX, y: e.clientY };
+        show(row, false);
       });
     });
 
-    workList.addEventListener("pointerleave", () => {
-      current = -1;
-      preview.classList.remove("is-on");
-      gsap.to(preview, { scale: 0.82, duration: 0.45, ease: "power2.out" });
-    });
+    workList.addEventListener("pointerleave", hide);
+
+    /* saat di-scroll kursornya diam tapi barisnya bergerak: cek elemen di
+       bawah kursor, lalu ganti / sembunyikan preview sesuai itu */
+    addEventListener(
+      "scroll",
+      () => {
+        if (!pointer) return;
+        const el = document.elementFromPoint(pointer.x, pointer.y);
+        const row = el && el.closest("[data-work]");
+        if (row && workList.contains(row)) show(row, true);
+        else hide();
+      },
+      { passive: true },
+    );
   }
 
   /* ------------------------------------------------------------------------
@@ -820,6 +873,14 @@
     };
 
     toggle.addEventListener("click", () => setOpen(!open));
+
+    /* selama menu terbuka, scroll apa pun (roda mouse, swipe) dibuang —
+       baik di panel menu maupun halaman di belakangnya */
+    const blockScroll = (e) => {
+      if (open) e.preventDefault();
+    };
+    addEventListener("wheel", blockScroll, { passive: false });
+    addEventListener("touchmove", blockScroll, { passive: false });
 
     addEventListener("keydown", (e) => {
       if (e.key === "Escape" && open) setOpen(false);

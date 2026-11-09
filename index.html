@@ -183,23 +183,30 @@
          ISI HALAMAN — z-10, jadi dia yang naik menutupi hero saat di-scroll
     ====================================================================== -->
     <main class="relative z-10 -mt-[100px]">
-      <!-- band marquee: tirai maroon pertama yang menutupi kartu hero -->
-      <div
-        class="marquee marquee--band bg-maroon py-[clamp(14px,2vw,22px)] text-cream"
-        data-marquee
-        data-speed="0.55"
-        aria-hidden="true"
-      >
-        <div class="marquee__track" data-marquee-track>
-          <div class="marquee__item">
-            <span>designer</span>
-            <svg class="asterisk h-[0.8em] w-[0.8em]" viewBox="-100 -100 200 200"><use href="#i-asterisk" fill="currentColor" /></svg>
-            <span>web developer</span>
-            <svg class="asterisk h-[0.8em] w-[0.8em]" viewBox="-100 -100 200 200"><use href="#i-asterisk" fill="currentColor" /></svg>
-            <span>ui &amp; ux</span>
-            <svg class="asterisk h-[0.8em] w-[0.8em]" viewBox="-100 -100 200 200"><use href="#i-asterisk" fill="currentColor" /></svg>
-            <span>front-end</span>
-            <svg class="asterisk h-[0.8em] w-[0.8em]" viewBox="-100 -100 200 200"><use href="#i-asterisk" fill="currentColor" /></svg>
+      <!-- dua pita marquee raksasa yang menyilang, warnanya berlawanan
+           (maroon vs cream) dan jalannya berlawanan arah. Ini tirai pertama
+           yang naik menutupi kartu hero. Gaya: .cross-marquee di input.css -->
+      <div class="cross-marquee" aria-hidden="true">
+        <div class="marquee cross-marquee__a" data-marquee data-speed="0.6">
+          <div class="marquee__track" data-marquee-track>
+            <div class="marquee__item">
+              <span>designer</span>
+              <svg class="asterisk h-[0.6em] w-[0.6em]" viewBox="-100 -100 200 200"><use href="#i-asterisk" fill="currentColor" /></svg>
+              <span>web developer</span>
+              <svg class="asterisk h-[0.6em] w-[0.6em]" viewBox="-100 -100 200 200"><use href="#i-asterisk" fill="currentColor" /></svg>
+            </div>
+          </div>
+        </div>
+        <div class="marquee cross-marquee__b" data-marquee data-speed="0.6" data-direction="-1">
+          <div class="marquee__track" data-marquee-track>
+            <div class="marquee__item">
+              <span>ui &amp; ux</span>
+              <svg class="asterisk h-[0.6em] w-[0.6em]" viewBox="-100 -100 200 200"><use href="#i-asterisk" fill="currentColor" /></svg>
+              <span>front-end</span>
+              <svg class="asterisk h-[0.6em] w-[0.6em]" viewBox="-100 -100 200 200"><use href="#i-asterisk" fill="currentColor" /></svg>
+              <span>interaction</span>
+              <svg class="asterisk h-[0.6em] w-[0.6em]" viewBox="-100 -100 200 200"><use href="#i-asterisk" fill="currentColor" /></svg>
+            </div>
           </div>
         </div>
       </div>
@@ -354,7 +361,7 @@
                   <span>01 / sololearn</span>
                   <span>jul 2026</span>
                 </div>
-                <div class="cert-card__cover cert-card__cover--maroon" style="--fit: 44cqw" aria-hidden="true">
+                <div class="cert-card__cover" style="--fit: 44cqw" aria-hidden="true">
                   <span class="cert-card__stamp">certificate</span>
                   <span class="cert-card__abbr">html</span>
                   <span class="cert-card__view">view ↗</span>
@@ -378,7 +385,7 @@
                   <span>02 / sololearn</span>
                   <span>jul 2026</span>
                 </div>
-                <div class="cert-card__cover cert-card__cover--clay" style="--fit: 56cqw" aria-hidden="true">
+                <div class="cert-card__cover" style="--fit: 56cqw" aria-hidden="true">
                   <span class="cert-card__stamp">certificate</span>
                   <span class="cert-card__abbr">css</span>
                   <span class="cert-card__view">view ↗</span>
@@ -402,7 +409,7 @@
                   <span>03 / sololearn</span>
                   <span>aug 2026</span>
                 </div>
-                <div class="cert-card__cover cert-card__cover--ink" style="--fit: 52cqw" aria-hidden="true">
+                <div class="cert-card__cover" style="--fit: 52cqw" aria-hidden="true">
                   <span class="cert-card__stamp">certificate</span>
                   <span class="cert-card__abbr">web</span>
                   <span class="cert-card__view">view ↗</span>
@@ -426,7 +433,7 @@
                   <span>04 / sololearn</span>
                   <span>nov 2026</span>
                 </div>
-                <div class="cert-card__cover cert-card__cover--maroon" style="--fit: 74cqw" aria-hidden="true">
+                <div class="cert-card__cover" style="--fit: 74cqw" aria-hidden="true">
                   <span class="cert-card__stamp">certificate</span>
                   <span class="cert-card__abbr">js</span>
                   <span class="cert-card__view">view ↗</span>
@@ -450,7 +457,7 @@
                   <span>05 / sololearn</span>
                   <span>nov 2026</span>
                 </div>
-                <div class="cert-card__cover cert-card__cover--clay" style="--fit: 30cqw" aria-hidden="true">
+                <div class="cert-card__cover" style="--fit: 30cqw" aria-hidden="true">
                   <span class="cert-card__stamp">certificate</span>
                   <span class="cert-card__abbr">prompt</span>
                   <span class="cert-card__view">view ↗</span>
@@ -539,21 +546,12 @@
         </div>
       </section>
 
-      <!-- jembatan ke contact: teks raksasa yang jalan ke samping -->
-      <div
-        class="marquee marquee--giant bg-paper pb-[clamp(60px,9vw,150px)] text-maroon"
-        data-marquee
-        data-speed="0.75"
-        aria-hidden="true"
-      >
-        <div class="marquee__track" data-marquee-track>
-          <div class="marquee__item">
-            <span>let's talk</span>
-            <svg class="asterisk h-[0.5em] w-[0.5em]" viewBox="-100 -100 200 200"><use href="#i-asterisk" fill="currentColor" /></svg>
-            <span class="is-outline">let's talk</span>
-            <svg class="asterisk h-[0.5em] w-[0.5em]" viewBox="-100 -100 200 200"><use href="#i-asterisk" fill="currentColor" /></svg>
-          </div>
-        </div>
+      <!-- jembatan ke contact: teks raksasa yang diam di tempat -->
+      <div class="bg-paper px-[clamp(18px,3.4vw,46px)] pb-[clamp(60px,9vw,150px)] text-maroon" aria-hidden="true">
+        <p class="talk-static">
+          <span>let's talk</span>
+          <svg class="asterisk asterisk--spin h-[0.5em] w-[0.5em]" viewBox="-100 -100 200 200"><use href="#i-asterisk" fill="currentColor" /></svg>
+        </p>
       </div>
     </main>
 
@@ -668,9 +666,6 @@
           <span class="swap__b" aria-hidden="true">send an email →</span>
         </a>
 
-        <a href="mailto:fakhrilfakih02@gmail.com" class="magnetic say-hello shrink-0" data-magnetic>
-          <span>say<br />hello</span>
-        </a>
       </div>
     </section>
 
