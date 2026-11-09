@@ -1,0 +1,14 @@
+{
+  "name": "fakeeh-porto-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Landing page portofolio - hero + dock navigation (Tailwind v4 CLI)",
+  "scripts": {
+    "dev": "tailwindcss -i ./src/input.css -o ./dist/output.css --watch",
+    "build": "tailwindcss -i ./src/input.css -o ./dist/output.css --minify"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.13",
+    "tailwindcss": "^4.1.13"
+  }
+}

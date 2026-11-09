@@ -1,0 +1,1683 @@
+@import "tailwindcss";
+
+/* Tailwind v4 memindai file di sekitar CSS ini. index.html ada di root dan
+   script-nya di src/js, jadi keduanya didaftarkan manual supaya class-nya
+   tidak ke-purge. */
+@source "../index.html";
+@source "./js";
+
+/* ---------------------------------------------------------------------------
+   FONT
+   "Gondens DEMO" (judul PORTOFOLIO) tidak ada di Google Fonts, jadi file-nya
+   disimpan di src/fonts/. Path relatif ke dist/output.css, karena url() tidak
+   ditulis ulang oleh CLI.
+--------------------------------------------------------------------------- */
+@font-face {
+  font-family: "Gondens DEMO";
+  src:
+    local("Gondens DEMO"),
+    url("../src/fonts/GondensDEMO.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
+/* ---------------------------------------------------------------------------
+   DESIGN TOKEN — warna tetap persis landing page di Figma, cuma ditambah
+   satu turunan ink yang lebih terang untuk melapis panel gelap.
+--------------------------------------------------------------------------- */
+@theme {
+  --color-ink: #461113; /* background halaman   */
+  --color-ink-soft: #5c1719; /* panel di atas ink    */
+  --color-maroon: #751c20; /* warna teks utama     */
+  --color-clay: #8e3e42; /* teks sekunder        */
+  --color-cream: #ffeda4; /* background hero      */
+  --color-paper: #fffae4; /* tombol scroll        */
+
+  --font-display: "Gondens DEMO", "Archivo Black", ui-sans-serif, sans-serif;
+  --font-body: "Poppins", ui-sans-serif, system-ui, sans-serif;
+
+  --radius-hero: 50px;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  /* Lenis mengambil alih smooth scroll, jadi scroll-behavior native dimatikan.
+     Anchor dihandle di src/js/main.js (fallback ke native kalau JS mati). */
+  html {
+    scroll-behavior: auto;
+  }
+
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+
+  /* CATATAN: jangan pasang overflow-x di <body>. overflow-x: hidden membuat
+     body jadi scroll container, dan itu mematikan position:sticky milik #hero
+     & #contact. Elemen yang melebar ke samping dikurung sendiri-sendiri
+     (.marquee, .cert-viewport, .work-row, wadah .skill). */
+  body {
+    @apply bg-ink font-body text-maroon antialiased;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-4 outline-cream;
+  }
+
+  /* di section terang, ring fokus perlu warna gelap supaya tetap kelihatan */
+  [data-theme="light"] :focus-visible {
+    @apply outline-maroon;
+  }
+
+  ::selection {
+    background: var(--color-maroon);
+    color: var(--color-cream);
+  }
+
+  /* kalau JS mati, semua elemen beranimasi tetap harus terbaca dan
+     elemen yang hanya berguna dengan JS tidak boleh menghalangi halaman */
+  html:not(.js) [data-anim] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  html:not(.js) .loader,
+  html:not(.js) .menu,
+  html:not(.js) .burger,
+  html:not(.js) .work-preview {
+    display: none !important;
+  }
+
+  html:not(.js) {
+    scroll-behavior: smooth;
+  }
+
+  html:not(.js) .topbar {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  html:not(.js) .topbar__pill {
+    pointer-events: auto;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   UTILITAS GLOBAL — logo tanda tangan, label kecil, motif *
+--------------------------------------------------------------------------- */
+@layer components {
+  /* Logo tanda tangan. File PNG-nya hitam di atas transparan dan dipakai
+     sebagai MASK, jadi warnanya = currentColor dan bisa ganti per tempat.
+     Path relatif ke dist/output.css, sama seperti @font-face di atas. */
+  .logo-mark {
+    display: block;
+    aspect-ratio: 900 / 1235;
+    background: currentColor;
+    -webkit-mask: url("../src/assets/logo-signature.png") center / contain no-repeat;
+    mask: url("../src/assets/logo-signature.png") center / contain no-repeat;
+  }
+
+  /* Tanda tangan yang "ditulis": mask logo DIIRIS dengan gradien miring.
+     JS menggeser --ink dari -15% ke 110%, jadi tintanya muncul dari kiri ke
+     kanan seperti sedang ditulis. Default 110% = tampil utuh (tanpa JS /
+     reduced motion tetap kelihatan). */
+  .sign-ink {
+    --ink: 110%;
+    display: block;
+    aspect-ratio: 900 / 1235;
+    background: currentColor;
+    -webkit-mask-image:
+      url("../src/assets/logo-signature.png"),
+      linear-gradient(100deg, #000 var(--ink), transparent calc(var(--ink) + 14%));
+    mask-image:
+      url("../src/assets/logo-signature.png"),
+      linear-gradient(100deg, #000 var(--ink), transparent calc(var(--ink) + 14%));
+    -webkit-mask-size: contain, 100% 100%;
+    mask-size: contain, 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-composite: source-in;
+    mask-composite: intersect;
+  }
+
+  /* label section kecil: "01 — hero" */
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6em;
+    font-size: clamp(10px, 1.1vw, 13px);
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  .eyebrow::before {
+    content: "";
+    width: clamp(18px, 3vw, 44px);
+    height: 1.5px;
+    background: currentColor;
+    opacity: 0.55;
+  }
+
+  /* tanda * khas landing page, dipakai berulang sebagai motif */
+  .asterisk {
+    display: block;
+    color: currentColor;
+  }
+
+  .asterisk--spin {
+    animation: asterisk-spin 14s linear infinite;
+  }
+
+  @keyframes asterisk-spin {
+    to {
+      rotate: 360deg;
+    }
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   TEKS BERANIMASI
+   splitWords()/splitChars() di main.js membungkus tiap kata/huruf jadi
+   .sp-w > .sp-i. Efek mask-nya dari overflow:clip di .sp-w.
+--------------------------------------------------------------------------- */
+@layer components {
+  .sp-w {
+    display: inline-block;
+    overflow: clip;
+    vertical-align: top;
+    padding-bottom: 0.08em;
+    margin-bottom: -0.08em;
+  }
+
+  .sp-i {
+    display: inline-block;
+    will-change: transform;
+  }
+
+  /* reveal kata per kata yang mengikuti scroll (dipakai di paragraf about) */
+  .fade-words .sp-w {
+    overflow: visible;
+  }
+
+  .fade-words .sp-i {
+    opacity: 0.16;
+    transition: opacity 0.35s linear;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   PRELOADER
+--------------------------------------------------------------------------- */
+@layer components {
+  .loader {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    display: grid;
+    place-items: center;
+    background: var(--color-ink);
+    will-change: transform;
+  }
+
+  .loader__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(18px, 3vw, 34px);
+    color: var(--color-cream);
+  }
+
+  .loader__mark {
+    height: clamp(120px, 26vh, 240px);
+  }
+
+  .loader__bar {
+    position: relative;
+    width: clamp(180px, 42vw, 420px);
+    height: 2px;
+    background: rgb(255 237 164 / 0.22);
+    overflow: clip;
+  }
+
+  .loader__bar i {
+    position: absolute;
+    inset: 0;
+    background: var(--color-cream);
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+  }
+
+  .loader__count {
+    font-size: clamp(11px, 1.4vw, 14px);
+    font-weight: 800;
+    letter-spacing: 0.24em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .loader.is-done {
+    pointer-events: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   TOPBAR + MENU OVERLAY
+   Topbar = pil cream melayang (logo + nama di kiri, tombol dua-garis di
+   kanan) yang baru muncul setelah halaman di-scroll. Tombolnya membuka panel
+   full-screen yang tersingkap lewat clip-path lingkaran yang membesar dari
+   posisi tombol itu sendiri.
+--------------------------------------------------------------------------- */
+@layer components {
+  /* Wadah transparan selebar layar; isinya pil yang melayang di tengah.
+     Tersembunyi (naik + pudar) sampai halaman di-scroll — JS menambah
+     .is-visible. Juga muncul kalau isinya kena fokus keyboard. */
+  .topbar {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 60;
+    display: flex;
+    justify-content: center;
+    padding: clamp(12px, 1.6vw, 20px) clamp(12px, 2.4vw, 32px);
+    pointer-events: none;
+    opacity: 0;
+    translate: 0 -28px;
+    transition:
+      opacity 0.5s var(--ease-out-expo),
+      translate 0.6s var(--ease-out-expo);
+  }
+
+  .topbar.is-visible,
+  .topbar:focus-within {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  .topbar.is-visible .topbar__pill,
+  .topbar:focus-within .topbar__pill {
+    pointer-events: auto;
+  }
+
+  .topbar__pill {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: min(100%, 1120px);
+    padding: 6px 8px 6px clamp(16px, 2vw, 24px);
+    border: 1px solid rgb(255 250 228 / 0.5);
+    border-radius: 999px;
+    background: rgb(255 237 164 / 0.88);
+    -webkit-backdrop-filter: blur(14px) saturate(1.2);
+    backdrop-filter: blur(14px) saturate(1.2);
+    box-shadow: 0 12px 34px rgb(70 17 19 / 0.18);
+    color: var(--color-maroon);
+  }
+
+  /* pil-nya selalu cream, jadi ring fokus di dalamnya harus maroon */
+  .topbar :focus-visible {
+    outline: 2px solid var(--color-maroon);
+    outline-offset: 3px;
+  }
+
+  .topbar__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    border-radius: 999px;
+  }
+
+  .topbar__logo {
+    height: 34px;
+  }
+
+  .topbar__word {
+    font-family: var(--font-display);
+    font-size: clamp(20px, 2vw, 26px);
+    line-height: 1;
+    letter-spacing: 0.03em;
+    padding-top: 2px;
+  }
+
+  /* ---- tombol dua garis ---- */
+  .burger {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-content: center;
+    gap: 7px;
+    /* 44x44 = target sentuh minimum, walau garisnya cuma 26px */
+    width: 44px;
+    height: 44px;
+    appearance: none;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    color: inherit;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .burger__line {
+    display: block;
+    width: 26px;
+    height: 2px;
+    border-radius: 2px;
+    background: currentColor;
+    transition:
+      transform 0.45s var(--ease-out-expo),
+      background-color 0.45s linear;
+  }
+
+  /* menu terbuka: pil tetap tampil di atas panel, garisnya jadi X */
+  .is-menu-open .topbar {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  .is-menu-open .topbar__pill {
+    pointer-events: auto;
+  }
+
+  .is-menu-open .burger__line:nth-child(2) {
+    transform: translateY(4.5px) rotate(45deg);
+  }
+
+  .is-menu-open .burger__line:nth-child(3) {
+    transform: translateY(-4.5px) rotate(-45deg);
+  }
+
+  /* ---- panel full-screen ----
+     Latarnya ink transparan + blur, jadi halaman di belakangnya masih
+     samar-samar kelihatan. Terbuka lewat clip-path lingkaran dari tombol menu;
+     visibility ikut dimatikan setelah tertutup supaya blur-nya tidak terus
+     dihitung browser selagi menu tidak dipakai. */
+  .menu {
+    position: fixed;
+    inset: 0;
+    z-index: 55;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(100px, 12vw, 150px) clamp(18px, 5vw, 86px) clamp(40px, 6vw, 80px);
+    background: rgb(70 17 19 / 0.62);
+    -webkit-backdrop-filter: blur(22px) saturate(1.15);
+    backdrop-filter: blur(22px) saturate(1.15);
+    color: var(--color-cream);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    pointer-events: none;
+    visibility: hidden;
+    clip-path: circle(0% at var(--menu-x, 92%) var(--menu-y, 5%));
+    transition:
+      clip-path 0.85s cubic-bezier(0.76, 0, 0.24, 1),
+      visibility 0s linear 0.85s;
+    will-change: clip-path;
+  }
+
+  .menu.is-open {
+    pointer-events: auto;
+    visibility: visible;
+    clip-path: circle(150% at var(--menu-x, 92%) var(--menu-y, 5%));
+    transition:
+      clip-path 1s cubic-bezier(0.76, 0, 0.24, 1),
+      visibility 0s linear 0s;
+  }
+
+  /* latarnya selalu gelap, jadi ring fokus dikunci cream — jangan ikut
+     data-theme section yang kebetulan sedang aktif di belakangnya */
+  .menu :focus-visible {
+    outline: 2px solid var(--color-cream);
+    outline-offset: 4px;
+  }
+
+  .menu__row {
+    border-bottom: 1.5px solid rgb(255 237 164 / 0.28);
+    overflow: clip;
+  }
+
+  .menu__link {
+    display: flex;
+    align-items: center;
+    gap: clamp(12px, 2vw, 28px);
+    padding: clamp(14px, 2vw, 26px) 0;
+    color: inherit;
+  }
+
+  /* Tiap baris naik dari bawah garisnya sendiri, bergantian (--i diisi di
+     HTML). Saat menutup, semuanya turun bersamaan tanpa jeda. */
+  .menu__label,
+  .menu__arrow {
+    translate: 0 110%;
+    will-change: translate;
+  }
+
+  .menu__label {
+    flex: 1;
+    font-size: clamp(38px, 7.6vw, 96px);
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: -0.06em;
+    text-transform: lowercase;
+    transition:
+      translate 0.45s cubic-bezier(0.76, 0, 0.24, 1),
+      opacity 0.35s linear;
+  }
+
+  .menu__arrow {
+    flex: none;
+    width: clamp(24px, 2.8vw, 40px);
+    height: clamp(24px, 2.8vw, 40px);
+    transition:
+      translate 0.45s cubic-bezier(0.76, 0, 0.24, 1),
+      transform 0.4s var(--ease-out-expo);
+  }
+
+  .menu.is-open .menu__label,
+  .menu.is-open .menu__arrow {
+    translate: 0 0;
+  }
+
+  .menu.is-open .menu__label {
+    transition:
+      translate 0.9s var(--ease-out-expo) calc(0.28s + var(--i, 0) * 0.07s),
+      opacity 0.35s linear;
+  }
+
+  .menu.is-open .menu__arrow {
+    transition:
+      translate 0.9s var(--ease-out-expo) calc(0.28s + var(--i, 0) * 0.07s),
+      transform 0.4s var(--ease-out-expo);
+  }
+
+  /* hover: teksnya memudar & panahnya naik ke pojok, cukup itu */
+  @media (hover: hover) {
+    .menu__link:hover .menu__label {
+      opacity: 0.6;
+    }
+
+    .menu__link:hover .menu__arrow {
+      transform: translate(4px, -4px);
+    }
+  }
+
+  /* section yang sedang dilihat */
+  .menu__link[aria-current="true"] .menu__label {
+    opacity: 0.45;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .menu,
+    .menu.is-open {
+      transition-duration: 0.01ms;
+    }
+
+    .menu__label,
+    .menu__arrow {
+      translate: 0 0;
+    }
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   HERO — ukuran judul PORTFOLIO ikut ukuran kartu (container query).
+   Di Figma: "PORTOFOLIO" (10 huruf) 270px di kartu 1350 x 662 -> lebar ±96%
+   kartu. Versi Inggris cuma 9 huruf, jadi angkanya dinaikkan ±10/9 supaya
+   lebarnya tetap sama.
+--------------------------------------------------------------------------- */
+@layer components {
+  .hero-card {
+    container-type: size;
+  }
+
+  .hero-title {
+    font-size: min(23cqw, 44cqh);
+  }
+
+  /* garis tipis yang "digambar" saat masuk */
+  .hero-rule {
+    height: 1.5px;
+    background: rgb(117 28 32 / 0.3);
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+  }
+
+  .hero-meta {
+    font-size: clamp(9px, 1.05vw, 12px);
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-clay);
+  }
+
+  /* tombol scroll: pil kecil berisi label + panah yang bergerak naik-turun */
+  .scroll-cue {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75em;
+    padding: clamp(10px, 1.3vw, 15px) clamp(16px, 2vw, 24px);
+    border-radius: 999px;
+    background: var(--color-paper);
+    color: var(--color-maroon);
+    font-size: clamp(10px, 1.08vw, 12px);
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .scroll-cue__arrow {
+    width: 1.2em;
+    height: 1.2em;
+    animation: nudge 1.9s var(--ease-out-expo) infinite;
+  }
+
+  @keyframes nudge {
+    0%,
+    100% {
+      transform: translateY(-2px);
+    }
+    50% {
+      transform: translateY(4px);
+    }
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   MARQUEE — jalan terus, arah & kecepatannya ikut arah scroll
+--------------------------------------------------------------------------- */
+@layer components {
+  .marquee {
+    display: flex;
+    overflow: clip;
+    user-select: none;
+  }
+
+  .marquee__track {
+    display: flex;
+    flex: none;
+    align-items: center;
+    will-change: transform;
+  }
+
+  .marquee__item {
+    display: inline-flex;
+    align-items: center;
+    gap: clamp(22px, 3.4vw, 56px);
+    padding-right: clamp(22px, 3.4vw, 56px);
+    white-space: nowrap;
+  }
+
+  .marquee--band .marquee__item {
+    font-size: clamp(12px, 1.5vw, 19px);
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .marquee--giant .marquee__item {
+    font-family: var(--font-display);
+    font-size: clamp(64px, 15vw, 230px);
+    line-height: 0.82;
+    letter-spacing: -0.01em;
+  }
+
+  /* varian outline untuk teks raksasa supaya tidak terlalu padat */
+  .marquee--giant .is-outline {
+    color: transparent;
+    -webkit-text-stroke: 1.6px currentColor;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   ABOUT
+--------------------------------------------------------------------------- */
+@layer components {
+  /* mask foto: gambarnya lebih tinggi dari mask lalu digeser saat scroll */
+  .media-mask {
+    position: relative;
+    overflow: clip;
+    border-radius: 25px;
+    background: var(--color-maroon);
+  }
+
+  .media-mask img {
+    position: absolute;
+    inset: -14% 0;
+    width: 100%;
+    height: 128%;
+    object-fit: cover;
+    will-change: transform;
+  }
+
+  /* Varian untuk gambar yang isinya padat sampai ke tepi (poster project):
+     overscan-nya dikecilkan supaya object-fit:cover tidak makan banyak sisi.
+     Pasangannya data-parallax-mask="5" di HTML, lihat modul parallax di main.js. */
+  .media-mask--soft img {
+    inset: -6% 0;
+    height: 112%;
+  }
+
+  /* Tiga angka singkat, dipisah garis tipis vertikal. Dulu angkanya pakai
+     font display yang glyph-nya lebih tinggi dari line-height-nya, jadi
+     menimpa label di bawahnya — sekarang pakai Poppins dengan line-height
+     normal dan jarak yang tegas, jadi tidak mungkin bertabrakan. */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border-top: 1.5px solid rgb(117 28 32 / 0.2);
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column-reverse; /* <dd> angka tampil di atas <dt> label */
+    justify-content: flex-end;
+    gap: clamp(6px, 0.8vw, 10px);
+    padding: clamp(16px, 2vw, 26px) clamp(10px, 1.6vw, 22px) 0;
+    border-left: 1.5px solid rgb(117 28 32 / 0.2);
+  }
+
+  .stat:first-child {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .stat__num {
+    font-size: clamp(34px, 4.6vw, 68px);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.05em;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-maroon);
+  }
+
+  .stat__label {
+    font-size: clamp(9px, 1vw, 12px);
+    font-weight: 800;
+    line-height: 1.3;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-clay);
+  }
+
+  /* baris skill: hover -> bidang maroon menyapu dari bawah */
+  .skill {
+    position: relative;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: clamp(12px, 1.8vw, 22px) clamp(10px, 1.6vw, 20px);
+    border-top: 1.5px solid rgb(117 28 32 / 0.2);
+    overflow: clip;
+    color: var(--color-maroon);
+  }
+
+  .skill:last-child {
+    border-bottom: 1.5px solid rgb(117 28 32 / 0.2);
+  }
+
+  .skill::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--color-maroon);
+    transform: translateY(101%);
+    transition: transform 0.55s var(--ease-out-expo);
+  }
+
+  .skill > * {
+    position: relative;
+    transition: color 0.4s var(--ease-out-expo);
+  }
+
+  .skill__name {
+    font-size: clamp(22px, 3.6vw, 48px);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.045em;
+  }
+
+  .skill__meta {
+    font-size: clamp(10px, 1.08vw, 13px);
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-clay);
+  }
+
+  @media (hover: hover) {
+    .skill:hover::before {
+      transform: translateY(0);
+    }
+
+    .skill:hover > *,
+    .skill:hover .skill__meta {
+      color: var(--color-cream);
+    }
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   ACHIEVEMENTS — galeri sertifikat yang di-pin lalu digeser ke samping.
+   .cert-stage yang dipin ScrollTrigger, jadi overflow clip dipasang di
+   .cert-viewport (di dalamnya), bukan di <section>-nya.
+--------------------------------------------------------------------------- */
+@layer components {
+  .cert-stage {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100svh;
+    padding: clamp(78px, 11vw, 120px) 0 clamp(58px, 7vw, 86px);
+    background: var(--color-ink);
+    color: var(--color-cream);
+  }
+
+  .cert-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 0 clamp(18px, 3.4vw, 46px);
+  }
+
+  /* padding atas-bawah = ruang untuk geseran naik-turun kartu (parallax),
+     supaya kartunya tidak menabrak judul / terpotong progress bar */
+  .cert-viewport {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    padding-block: clamp(22px, 4vh, 44px);
+    overflow: clip;
+  }
+
+  .cert-track {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: clamp(18px, 2.6vw, 40px);
+    padding: 0 clamp(18px, 3.4vw, 46px);
+    width: max-content;
+    /* tinggi pasti = sisa ruang di viewport; tanpa ini height:100% milik
+       kartu tidak bisa dihitung dan kartunya selalu 560px (menabrak judul) */
+    height: 100%;
+    will-change: transform;
+  }
+
+  /* panel pembuka/penutup: teks saja, lebih sempit dari kartu */
+  .cert-panel {
+    flex: none;
+    width: min(74vw, 400px);
+    align-self: center;
+  }
+
+  /* Sertifikatnya landscape (A4 mendatar, rasio ~1.41), jadi kartunya lebar.
+     Tingginya ikut ruang yang tersisa di panggung supaya aman di layar pendek. */
+  .cert-card {
+    position: relative;
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    width: min(86vw, 560px);
+    height: min(100%, 540px);
+    padding: clamp(14px, 1.8vw, 20px);
+    border-radius: 26px;
+    background: var(--color-cream);
+    color: var(--color-maroon);
+    will-change: transform;
+  }
+
+  /* tombol transparan seukuran kartu: pemicu lightbox + target keyboard */
+  .cert-card__open {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    appearance: none;
+    background: transparent;
+    border: 0;
+    border-radius: 26px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .cert-card__open:focus-visible {
+    outline: 3px solid var(--color-maroon);
+    outline-offset: 4px;
+  }
+
+  .cert-card__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: clamp(10px, 1.08vw, 12px);
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-clay);
+  }
+
+  /* Sampul kartu: singkatan skill besar di atas bidang warna. Gambar
+     sertifikatnya sengaja TIDAK ditampilkan di sini (dulu jadi kepotong);
+     baru muncul utuh di lightbox saat kartu diklik.
+     Ukuran hurufnya dari --fit (diisi per kartu di HTML), dibatasi juga
+     tinggi sampul lewat container query. */
+  .cert-card__cover {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    margin: clamp(12px, 1.5vw, 18px) 0;
+    padding: clamp(14px, 1.6vw, 20px);
+    border-radius: 16px;
+    overflow: clip;
+    container-type: size;
+    background: var(--color-maroon);
+    color: var(--color-cream);
+  }
+
+  .cert-card__cover--clay {
+    background: var(--color-clay);
+  }
+
+  .cert-card__cover--ink {
+    background: var(--color-ink);
+  }
+
+  .cert-card__stamp {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6em;
+    font-size: clamp(9px, 0.95vw, 11px);
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    opacity: 0.75;
+  }
+
+  .cert-card__stamp::before {
+    content: "";
+    width: 0.7em;
+    height: 0.7em;
+    border-radius: 999px;
+    background: currentColor;
+  }
+
+  /* text-box memangkas ruang kosong di atas/bawah huruf, jadi bottom di
+     bawah ini benar-benar jarak dari garis dasar huruf ke tepi sampul */
+  .cert-card__abbr {
+    position: absolute;
+    left: clamp(14px, 1.6vw, 20px);
+    bottom: clamp(14px, 1.6vw, 20px);
+    font-family: var(--font-display);
+    font-size: min(var(--fit, 40cqw), 44cqh);
+    line-height: 1;
+    text-box: trim-both cap alphabetic;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: translate 0.7s var(--ease-out-expo);
+  }
+
+  .cert-card__view {
+    position: absolute;
+    top: clamp(12px, 1.4vw, 18px);
+    right: clamp(12px, 1.4vw, 18px);
+    padding: 0.55em 1em;
+    border-radius: 999px;
+    background: var(--color-cream);
+    color: var(--color-maroon);
+    font-size: clamp(10px, 1vw, 12px);
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0;
+    translate: 0 -6px;
+    transition:
+      opacity 0.35s linear,
+      translate 0.5s var(--ease-out-expo);
+  }
+
+  .cert-card__title {
+    font-size: clamp(24px, 2.9vw, 42px);
+    font-weight: 900;
+    line-height: 0.86;
+    letter-spacing: -0.055em;
+    text-transform: lowercase;
+  }
+
+  .cert-card__desc {
+    margin-top: 0.7em;
+    font-size: clamp(12px, 1.3vw, 15px);
+    line-height: 1.45;
+    letter-spacing: -0.01em;
+    color: var(--color-clay);
+  }
+
+  @media (hover: hover) {
+    .cert-card:hover .cert-card__abbr {
+      translate: 0 -6%;
+    }
+
+    .cert-card:hover .cert-card__view {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+
+  /* di layar sentuh tidak ada hover, jadi label "view" selalu tampil */
+  @media (hover: none) {
+    .cert-card__view {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+
+  /* Layar potret (HP): ruangnya tinggi tapi kartunya sempit; tinggi kartu
+     ikut isi dan sampulnya dikunci ke rasio tetap. */
+  @media (max-aspect-ratio: 4/5) {
+    .cert-card {
+      height: auto;
+      max-height: 100%;
+    }
+
+    .cert-card__cover {
+      flex: none;
+      aspect-ratio: 1.5;
+    }
+  }
+
+  /* di layar pendek, deskripsi dibuang supaya sampulnya tetap kebagian ruang */
+  @media (max-height: 760px) {
+    .cert-card__desc {
+      display: none;
+    }
+  }
+
+  .cert-bar {
+    display: flex;
+    align-items: center;
+    gap: clamp(12px, 1.8vw, 20px);
+    padding: clamp(14px, 2vw, 22px) clamp(18px, 3.4vw, 46px) 0;
+    font-size: clamp(10px, 1.05vw, 12px);
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .cert-bar__rail {
+    position: relative;
+    flex: 1;
+    height: 2px;
+    background: rgb(255 237 164 / 0.22);
+    overflow: clip;
+  }
+
+  .cert-bar__rail i {
+    position: absolute;
+    inset: 0;
+    background: var(--color-cream);
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+  }
+
+  /* ------------------------------------------------------------------------
+     LIGHTBOX SERTIFIKAT
+     Sengaja polos: latar gelap ber-blur, sertifikatnya sendirian di tengah,
+     keterangan kecil di bawah. Tidak ada panel/bingkai tambahan.
+     <dialog> asli: Esc, backdrop, dan balik fokus ke tombol pemicu sudah
+     ditangani browser.
+  ------------------------------------------------------------------------ */
+  .lightbox {
+    width: 100vw;
+    height: 100svh;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: clamp(14px, 2.4vw, 32px) clamp(16px, 3.4vw, 46px);
+    border: 0;
+    background: transparent;
+    color: var(--color-cream);
+    overflow: hidden;
+  }
+
+  .lightbox[open] {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    gap: clamp(12px, 2vh, 24px);
+    animation: lb-fade 0.35s ease-out;
+  }
+
+  .lightbox::backdrop {
+    background: rgb(40 9 11 / 0.9);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+  }
+
+  .lightbox[open]::backdrop {
+    animation: lb-fade 0.35s ease-out;
+  }
+
+  .lightbox__top,
+  .lightbox__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .lightbox__count {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: rgb(255 237 164 / 0.6);
+  }
+
+  /* gambar diposisikan absolut di dalam panggung supaya max-width/height
+     100% punya acuan pasti (baris grid tengah) — tanpa ini gambarnya tumbuh
+     sebesar aslinya dan menutupi keterangan di bawah */
+  .lightbox__stage {
+    position: relative;
+    min-height: 0;
+    margin: 0;
+  }
+
+  .lightbox__stage img {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    max-width: min(100%, 1240px);
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    border-radius: 6px;
+    box-shadow: 0 30px 80px rgb(0 0 0 / 0.45);
+  }
+
+  .lightbox[open] .lightbox__stage img {
+    animation: lb-rise 0.6s var(--ease-out-expo);
+  }
+
+  .lightbox__title {
+    font-size: clamp(16px, 1.6vw, 20px);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .lightbox__meta {
+    margin-top: 4px;
+    font-size: clamp(11px, 1vw, 13px);
+    letter-spacing: 0.04em;
+    color: rgb(255 237 164 / 0.6);
+  }
+
+  .lightbox__nav {
+    display: flex;
+    gap: 8px;
+  }
+
+  .lightbox__btn {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    flex: none;
+    border: 1px solid rgb(255 237 164 / 0.28);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--color-cream);
+    cursor: pointer;
+    transition:
+      background-color 0.25s linear,
+      border-color 0.25s linear;
+  }
+
+  .lightbox__btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  @media (hover: hover) {
+    .lightbox__btn:hover {
+      background: rgb(255 237 164 / 0.1);
+      border-color: rgb(255 237 164 / 0.6);
+    }
+  }
+
+  .lightbox :focus-visible {
+    outline: 2px solid var(--color-cream);
+    outline-offset: 3px;
+  }
+
+  @keyframes lb-fade {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes lb-rise {
+    from {
+      opacity: 0;
+      translate: 0 18px;
+      scale: 0.98;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lightbox[open],
+    .lightbox[open]::backdrop,
+    .lightbox[open] .lightbox__stage img {
+      animation: none;
+    }
+  }
+
+  /* fallback reduced-motion / no-JS: digeser manual, tanpa pin */
+  .cert-fallback .cert-stage {
+    height: auto;
+  }
+
+  .cert-fallback .cert-viewport {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+  }
+
+  .cert-fallback .cert-card,
+  .cert-fallback .cert-panel {
+    scroll-snap-align: center;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   WORKS — daftar index gaya awwwards: baris besar, preview mengikuti kursor
+--------------------------------------------------------------------------- */
+@layer components {
+  .work-row {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: clamp(12px, 2vw, 32px);
+    padding: clamp(20px, 3.2vw, 46px) clamp(12px, 2vw, 28px);
+    border-top: 1.5px solid rgb(117 28 32 / 0.22);
+    overflow: clip;
+    color: var(--color-maroon);
+  }
+
+  .work-list .work-row:last-child {
+    border-bottom: 1.5px solid rgb(117 28 32 / 0.22);
+  }
+
+  .work-row::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--color-maroon);
+    transform: translateY(101%);
+    transition: transform 0.6s var(--ease-out-expo);
+  }
+
+  .work-row > * {
+    position: relative;
+    transition: color 0.45s var(--ease-out-expo);
+  }
+
+  .work-row__idx {
+    font-size: clamp(10px, 1.1vw, 13px);
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    color: var(--color-clay);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .work-row__title {
+    font-size: clamp(32px, 7vw, 100px);
+    font-weight: 800;
+    line-height: 0.9;
+    letter-spacing: -0.06em;
+    text-transform: lowercase;
+    transition:
+      transform 0.6s var(--ease-out-expo),
+      color 0.45s var(--ease-out-expo);
+  }
+
+  .work-row__tag {
+    font-size: clamp(9px, 1.05vw, 12px);
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-clay);
+    text-align: right;
+  }
+
+  @media (hover: hover) {
+    .work-row:hover::before {
+      transform: translateY(0);
+    }
+
+    .work-row:hover > *,
+    .work-row:hover .work-row__idx,
+    .work-row:hover .work-row__tag {
+      color: var(--color-cream);
+    }
+
+    .work-row:hover .work-row__title {
+      transform: translateX(clamp(8px, 1.6vw, 26px));
+    }
+  }
+
+  /* kartu preview yang mengikuti kursor */
+  .work-preview {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 75;
+    width: clamp(210px, 19vw, 290px);
+    aspect-ratio: 4 / 5;
+    border-radius: 18px;
+    overflow: clip;
+    pointer-events: none;
+    opacity: 0;
+    display: none;
+    box-shadow: 0 26px 60px rgb(70 17 19 / 0.4);
+    transition: opacity 0.35s var(--ease-out-expo);
+    will-change: transform;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .work-preview {
+      display: block;
+    }
+  }
+
+  .work-preview.is-on {
+    opacity: 1;
+  }
+
+  .work-preview__slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.3s linear;
+  }
+
+  .work-preview__slide.is-on {
+    opacity: 1;
+  }
+
+  .work-preview__slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* ------------------------------------------------------------------------
+     Kartu besar di bawah daftar — ini yang jadi tampilan utama di layar sentuh.
+     Gambarnya dibesarkan di dalam .media-mask lalu digeser pelan saat scroll,
+     jadi parallax-nya di dalam bingkai, bukan bingkainya yang ikut bergerak.
+  ------------------------------------------------------------------------ */
+  /* Grid thumbnail cuma dipakai di layar tanpa kursor. Di desktop, daftar
+     index + preview yang mengikuti kursor sudah menampilkan gambar yang sama,
+     jadi grid-nya disembunyikan supaya tidak dobel. */
+  @media (hover: hover) and (pointer: fine) {
+    .work-grid {
+      display: none;
+    }
+  }
+
+  .work-tile {
+    display: block;
+  }
+
+  /* GSAP menulis ke `transform` (parallax), jadi zoom hover pakai properti
+     `scale` yang terpisah supaya keduanya tidak saling menimpa */
+  .work-tile .media-mask img {
+    transition: scale 0.8s var(--ease-out-expo);
+  }
+
+  @media (hover: hover) {
+    .work-tile:hover .media-mask img {
+      scale: 1.06;
+    }
+  }
+
+  .work-cap {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.3em 1rem;
+    margin-top: clamp(10px, 1.4vw, 18px);
+  }
+
+  .work-cap__name {
+    font-size: clamp(20px, 2.4vw, 32px);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.05em;
+    text-transform: lowercase;
+    color: var(--color-maroon);
+  }
+
+  .work-cap__meta {
+    font-size: clamp(9px, 1vw, 11px);
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-clay);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   CONTACT
+--------------------------------------------------------------------------- */
+@layer components {
+  /* judul di kiri, tanda tangan di kanan (di HP: tanda tangan di bawah judul,
+     rata kanan) */
+  .contact-main {
+    display: grid;
+    align-items: center;
+    gap: clamp(8px, 2vw, 40px);
+  }
+
+  @media (min-width: 768px) {
+    .contact-main {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+  }
+
+  .contact-title {
+    max-width: 14ch;
+    font-size: clamp(40px, 8.4vw, 140px);
+    font-weight: 900;
+    line-height: 0.88;
+    letter-spacing: -0.06em;
+    text-transform: lowercase;
+  }
+
+  /* Tanda tangan yang menulis sendiri. Tingginya dibatasi tinggi & lebar
+     layar supaya muat di section yang tingginya cuma 1 layar. */
+  .sign-draw {
+    display: block;
+    justify-self: end;
+    height: clamp(150px, min(46svh, 40vw), 460px);
+    width: auto;
+    aspect-ratio: 900 / 1235;
+    color: var(--color-cream);
+    overflow: visible;
+  }
+
+  /* tombol magnet: posisinya digeser JS lewat --mx/--my */
+  .magnetic {
+    --mx: 0px;
+    --my: 0px;
+    translate: var(--mx) var(--my);
+    transition: translate 0.45s var(--ease-out-expo);
+  }
+
+  .say-hello {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: clamp(128px, 16vw, 200px);
+    aspect-ratio: 1;
+    border-radius: 999px;
+    background: var(--color-cream);
+    color: var(--color-ink);
+    overflow: clip;
+    font-size: clamp(12px, 1.4vw, 16px);
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .say-hello::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--color-maroon);
+    border-radius: 999px;
+    transform: scale(0);
+    transition: transform 0.6s var(--ease-out-expo);
+  }
+
+  .say-hello span {
+    position: relative;
+    transition: color 0.45s var(--ease-out-expo);
+  }
+
+  @media (hover: hover) {
+    .say-hello:hover::before {
+      transform: scale(1.06);
+    }
+
+    .say-hello:hover span {
+      color: var(--color-cream);
+    }
+  }
+
+  /* baris email/sosmed: hover -> teks naik, duplikatnya masuk dari bawah */
+  .swap {
+    position: relative;
+    display: inline-block;
+    overflow: clip;
+    vertical-align: bottom;
+  }
+
+  .swap__a,
+  .swap__b {
+    display: block;
+    transition: transform 0.5s var(--ease-out-expo);
+  }
+
+  .swap__b {
+    position: absolute;
+    inset: 0;
+    transform: translateY(100%);
+  }
+
+  @media (hover: hover) {
+    a:hover .swap__a {
+      transform: translateY(-100%);
+    }
+
+    a:hover .swap__b {
+      transform: translateY(0);
+    }
+  }
+
+  .link-line {
+    position: relative;
+    display: inline-block;
+  }
+
+  .link-line::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -0.12em;
+    width: 100%;
+    height: 1.5px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    transition: transform 0.5s var(--ease-out-expo);
+  }
+
+  @media (hover: hover) {
+    .link-line:hover::after {
+      transform: scaleX(1);
+    }
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   FOOTER — tirai cream yang naik menutupi contact (contact-nya sticky).
+   Kiri: salam penutup + link sosmed besar. Kanan: tanda tangan raksasa yang
+   "ditulis" mengikuti scroll (.sign-ink, digerakkan modul FOOTER di main.js).
+--------------------------------------------------------------------------- */
+@layer components {
+  .site-footer {
+    position: relative;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 100svh;
+    border-radius: clamp(28px, 4vw, 50px) clamp(28px, 4vw, 50px) 0 0;
+    background: var(--color-cream);
+    color: var(--color-maroon);
+    overflow: clip;
+  }
+
+  .footer-main {
+    display: grid;
+    align-items: center;
+    gap: clamp(36px, 5vw, 72px);
+    /* atas dibuat lega: pil nav melayang di ~0–80px */
+    padding: clamp(110px, 11vw, 160px) clamp(18px, 3.4vw, 46px) clamp(32px, 4vw, 56px);
+  }
+
+  @media (min-width: 1024px) {
+    .footer-main {
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      align-items: end;
+    }
+  }
+
+  .footer-title {
+    margin-top: clamp(14px, 1.8vw, 24px);
+    max-width: 12ch;
+    font-size: clamp(44px, 8vw, 132px);
+    font-weight: 900;
+    line-height: 0.9;
+    letter-spacing: -0.06em;
+    text-transform: lowercase;
+  }
+
+  .footer-links {
+    border-top: 1.5px solid rgb(117 28 32 / 0.2);
+  }
+
+  /* baris sosmed: hover -> bidang maroon menyapu naik, sama seperti .work-row */
+  .footer-link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: clamp(12px, 1.5vw, 18px) clamp(8px, 1vw, 14px);
+    border-bottom: 1.5px solid rgb(117 28 32 / 0.2);
+    overflow: clip;
+  }
+
+  .footer-link::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--color-maroon);
+    transform: translateY(101%);
+    transition: transform 0.55s var(--ease-out-expo);
+  }
+
+  .footer-link__label,
+  .footer-link__arrow {
+    position: relative;
+    transition:
+      transform 0.55s var(--ease-out-expo),
+      color 0.4s var(--ease-out-expo);
+  }
+
+  .footer-link__label {
+    font-size: clamp(26px, 3.4vw, 52px);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.05em;
+  }
+
+  .footer-link__arrow {
+    width: clamp(20px, 2.2vw, 30px);
+    height: clamp(20px, 2.2vw, 30px);
+  }
+
+  @media (hover: hover) {
+    .footer-link:hover::before {
+      transform: translateY(0);
+    }
+
+    .footer-link:hover .footer-link__label,
+    .footer-link:hover .footer-link__arrow {
+      color: var(--color-cream);
+    }
+
+    .footer-link:hover .footer-link__label {
+      transform: translateX(clamp(6px, 1vw, 14px));
+    }
+
+    .footer-link:hover .footer-link__arrow {
+      transform: rotate(45deg);
+    }
+  }
+
+  .footer-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 24px;
+    padding: clamp(14px, 2vw, 22px) clamp(18px, 3.4vw, 46px);
+    border-top: 1.5px solid rgb(117 28 32 / 0.2);
+  }
+
+  .to-top {
+    display: grid;
+    place-items: center;
+    width: clamp(48px, 4.4vw, 60px);
+    aspect-ratio: 1;
+    border-radius: 999px;
+    border: 1.5px solid rgb(117 28 32 / 0.35);
+    color: var(--color-maroon);
+    transition:
+      background-color 0.4s var(--ease-out-expo),
+      color 0.4s var(--ease-out-expo);
+  }
+
+  @media (hover: hover) {
+    .to-top:hover {
+      background: var(--color-maroon);
+      color: var(--color-cream);
+    }
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   REDUCED MOTION — matikan semua gerakan dekoratif
+--------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .asterisk--spin,
+  .scroll-cue__arrow {
+    animation: none !important;
+  }
+
+  .fade-words .sp-i {
+    opacity: 1 !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+  }
+}
