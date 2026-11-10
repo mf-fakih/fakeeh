@@ -1,19 +1,7 @@
-/* ===========================================================================
-   Portofolio Fakeeh — interaksi & animasi scroll
-   ---------------------------------------------------------------------------
-   Library (dimuat dari CDN di index.html):
-     - GSAP 3.12.5 + ScrollTrigger  -> semua animasi yang mengikuti scroll
-     - Lenis 1.1.18                 -> smooth scroll
 
-   Aturan yang dipegang semua modul di bawah:
-     1. Kalau elemennya tidak ada di halaman, modulnya diam saja.
-     2. Kalau GSAP/Lenis gagal dimuat, halaman tetap bisa dibaca & di-scroll.
-     3. prefers-reduced-motion: reduce -> semua gerakan dekoratif dimatikan.
-=========================================================================== */
 (() => {
   "use strict";
 
-  const html = document.documentElement;
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
@@ -24,10 +12,6 @@
 
   if (hasST) gsap.registerPlugin(ScrollTrigger);
 
-  /* ------------------------------------------------------------------------
-     SMOOTH SCROLL
-     Lenis yang menggerakkan window, lalu ScrollTrigger diberi tahu tiap frame.
-  ------------------------------------------------------------------------ */
   let lenis = null;
 
   if (!reduce && typeof window.Lenis !== "undefined") {
@@ -51,10 +35,7 @@
     }
   }
 
-  /* Posisi asli elemen di dokumen. #hero dan #contact itu position:sticky:
-     begitu "nempel", rect-nya selalu 0 dari atas layar, jadi scroll ke sana
-     tidak bergerak sama sekali. Untuk elemen sticky, posisinya diukur
-     sesaat sebagai static (sinkron, tidak sempat ter-render). */
+  // Temporarily unstick elements to measure their document position.
   const docTop = (el) => {
     const sticky = getComputedStyle(el).position === "sticky";
     if (sticky) el.style.position = "static";
@@ -63,7 +44,6 @@
     return Math.max(0, y);
   };
 
-  /* semua anchor internal lewat sini, biar ikut smooth scroll-nya Lenis */
   const goTo = (el) => {
     if (!el) return;
     const y = docTop(el);
@@ -83,11 +63,6 @@
     });
   });
 
-  /* ------------------------------------------------------------------------
-     PEMECAH TEKS
-     Tiap kata/huruf dibungkus .sp-w (mask) > .sp-i (yang digerakkan).
-     Hanya untuk elemen berisi teks biasa — isinya ditulis ulang total.
-  ------------------------------------------------------------------------ */
   const wrapPart = (text) => {
     const outer = document.createElement("span");
     outer.className = "sp-w";
@@ -119,19 +94,13 @@
     });
   };
 
-  /* ------------------------------------------------------------------------
-     HERO — judul dipecah per huruf, dipakai intro & efek scroll
-  ------------------------------------------------------------------------ */
   const heroTitle = $("[data-hero-title]");
   const heroChars = heroTitle ? splitChars(heroTitle) : [];
   const heroWraps = heroChars.map((c) => c.parentElement);
   const heroReveals = $$("#hero [data-anim]");
 
   if (hasGsap && heroTitle) {
-    /* Centering judul tetap dari class -translate-*-1/2. Di Tailwind v4 class
-       itu memakai properti CSS `translate`, terpisah dari `transform` yang
-       ditulis GSAP — jadi keduanya bertumpuk dengan benar. JANGAN tambahkan
-       xPercent/yPercent -50 di sini: hasilnya geser dua kali. */
+    // Tailwind centers with `translate`; GSAP animates `transform`.
     gsap.set(heroChars, { yPercent: 105, rotate: 4, force3D: true });
     gsap.set(heroReveals, { opacity: 0, y: 22 });
     gsap.set($$('#hero [data-anim="pop"]'), { opacity: 0, y: 0, scale: 0.7 });
@@ -141,14 +110,11 @@
     if (!hasGsap) return;
     const tl = gsap.timeline({
       onComplete: () => {
-        /* mask sudah terbuka penuh -> lepas, supaya huruf bisa melebar ke
-           samping saat di-scroll tanpa kepotong */
+
         gsap.set(heroWraps, { clipPath: "none" });
       },
     });
 
-    /* power3.out + durasi panjang: gerakannya mengalir sampai akhir, tidak
-       "lompat" di awal seperti expo. Rotate kecil biar terasa organik. */
     tl.to(heroChars, {
       yPercent: 0,
       rotate: 0,
@@ -156,8 +122,7 @@
       ease: "power4.out",
       stagger: reduce ? 0 : 0.07,
     })
-      /* mask dibuka pelan: sisi atas naik, sisi bawah turun, mulai selagi
-         huruf masih meluncur masuk, jadi tidak ada patahan di akhir */
+
       .to(
         heroWraps,
         {
@@ -191,9 +156,6 @@
       );
   };
 
-  /* ------------------------------------------------------------------------
-     PRELOADER — angka 0→100, lalu panelnya diangkat ke atas
-  ------------------------------------------------------------------------ */
   const loader = $("[data-loader]");
 
   const runLoader = () => {
@@ -235,8 +197,7 @@
         },
         0.1,
       )
-      /* refresh (berat: ukur ulang semua trigger) dijalankan selagi preloader
-         masih menutupi layar — kalau setelahnya, intro hero jadi tersendat */
+
       .call(() => hasST && ScrollTrigger.refresh())
       .to(mark, { opacity: 0, y: -24, duration: reduce ? 0.01 : 0.5, ease: "power2.in" }, "+=0.15")
       .to(
@@ -247,40 +208,14 @@
       .call(heroIntro, null, "-=0.6");
   };
 
-  /* mulai selalu dari atas, biar preloader + intro-nya utuh */
   if ("scrollRestoration" in history) history.scrollRestoration = "manual";
   scrollTo(0, 0);
   runLoader();
 
-  /* ======================================================================
-     Semua di bawah ini butuh ScrollTrigger. Tanpa itu halaman tetap utuh,
-     cuma tanpa animasi.
-  ====================================================================== */
   if (!hasST) {
     $("[data-cert]")?.classList.add("cert-fallback");
   }
 
-  /* ------------------------------------------------------------------------
-     TOPBAR — pil nav baru muncul setelah halaman di-scroll melewati
-     SHOW_AFTER px. Lenis menggerakkan window, jadi event scroll biasa cukup.
-  ------------------------------------------------------------------------ */
-  const topbar = $("[data-topbar]");
-  if (topbar) {
-    const SHOW_AFTER = 80;
-    const sync = () => topbar.classList.toggle("is-visible", scrollY > SHOW_AFTER);
-    addEventListener("scroll", sync, { passive: true });
-    sync();
-  }
-
-  /* ------------------------------------------------------------------------
-     HERO — efek saat ditinggalkan: judul mundur, huruf melebar, foto maju.
-
-     Trigger-nya <main>, BUKAN #hero. #hero itu position:sticky, jadi begitu
-     nempel di atas rect-nya berhenti bergerak dan ScrollTrigger salah ukur.
-     <main> punya -mt-100px, artinya atasnya ada di scroll (innerHeight-100).
-     Jadi:  start = atas <main> di (innerHeight-100)px dari atas layar -> scroll 0
-            end   = atas <main> di atas layar                           -> hero tertutup
-  ------------------------------------------------------------------------ */
   if (hasST && !reduce && heroTitle) {
     const spread = heroChars.length > 1 ? (heroChars.length - 1) / 2 : 0;
 
@@ -304,7 +239,6 @@
       .to("[data-hero-card]", { scale: 0.95, ease: "none" }, 0);
   }
 
-  /* foto hero miring sedikit mengikuti kursor */
   const tilt = $("[data-hero-tilt]");
   if (tilt && canHover && !reduce && hasGsap) {
     const toX = gsap.quickTo(tilt, "x", { duration: 0.9, ease: "power3" });
@@ -321,9 +255,6 @@
     );
   }
 
-  /* ------------------------------------------------------------------------
-     REVEAL UMUM — data-anim, data-split, data-slide
-  ------------------------------------------------------------------------ */
   const presets = {
     up: { y: 34, opacity: 0 },
     fade: { opacity: 0 },
@@ -347,12 +278,11 @@
       });
 
     $$("[data-split]").forEach((el) => {
-      if (el.hasAttribute("data-hero-title")) return; // sudah dipakai intro hero
+      if (el.hasAttribute("data-hero-title")) return;
 
       const mode = el.dataset.split;
       const parts = mode === "chars" ? splitChars(el) : splitWords(el);
 
-      /* paragraf fade-words dipecah di sini, tapi animasinya di modul bawah */
       if (el.hasAttribute("data-fade-words")) return;
 
       gsap.set(parts, { yPercent: 115 });
@@ -377,7 +307,6 @@
       });
     });
 
-    /* paragraf about: tiap kata menyala satu per satu mengikuti scroll */
     if (!reduce) {
       $$("[data-fade-words]").forEach((el) => {
         gsap.to($$(".sp-i", el), {
@@ -395,14 +324,8 @@
     }
   }
 
-  /* ------------------------------------------------------------------------
-     PARALLAX — data-parallax (elemen) & foto di dalam mask-nya
-  ------------------------------------------------------------------------ */
   if (hasST && !reduce) {
-    /* Gambar digeser di DALAM bingkainya. Besaran geseran (dalam %) boleh
-       diatur per-elemen lewat nilai data-parallax-mask; defaultnya 8.
-       Angkanya harus <= overscan .media-mask di CSS, kalau lebih nanti
-       tepi bingkainya bolong. */
+
     $$("[data-parallax-mask]").forEach((mask) => {
       const img = $("[data-parallax-img]", mask);
       if (!img) return;
@@ -424,9 +347,6 @@
     });
   }
 
-  /* ------------------------------------------------------------------------
-     PENGHITUNG ANGKA
-  ------------------------------------------------------------------------ */
   if (hasST) {
     $$("[data-count]").forEach((el) => {
       const target = Number(el.dataset.count) || 0;
@@ -446,9 +366,6 @@
     });
   }
 
-  /* ------------------------------------------------------------------------
-     MARQUEE — jalan terus; arah & kecepatannya ikut arah scroll
-  ------------------------------------------------------------------------ */
   const marquees = [];
 
   if (hasGsap) {
@@ -457,9 +374,6 @@
       const seed = track && $(".marquee__item", track);
       if (!seed) return;
 
-      /* isi track sampai panjangnya >= 1 layar + 1 blok, lalu seluruh
-         isinya digandakan. Karena separuh depan = separuh belakang, animasi
-         xPercent -50 yang diulang terus tidak kelihatan sambungannya. */
       let guard = 0;
       while (track.scrollWidth < wrap.offsetWidth + seed.offsetWidth && guard++ < 24) {
         track.appendChild(seed.cloneNode(true));
@@ -471,8 +385,6 @@
       const speed = parseFloat(wrap.dataset.speed) || 0.5;
       const distance = track.scrollWidth / 2;
 
-      /* data-direction="-1" -> jalan ke kanan (dipakai pita kedua yang
-         menyilang, supaya dua pitanya berlawanan arah) */
       const reverse = wrap.dataset.direction === "-1";
       const tl = gsap.fromTo(
         track,
@@ -487,7 +399,6 @@
 
       marquees.push(tl);
 
-      /* dijeda kalau sedang tidak kelihatan — hemat kerja di main thread */
       if (hasST) {
         ScrollTrigger.create({
           trigger: wrap,
@@ -511,10 +422,6 @@
     });
   }
 
-  /* ------------------------------------------------------------------------
-     ACHIEVEMENTS — panggung di-pin, kartunya digeser ke samping.
-     Inilah bagian "scroll ke bawah tapi jalannya ke kanan".
-  ------------------------------------------------------------------------ */
   const cert = $("[data-cert]");
 
   if (cert && hasST) {
@@ -555,32 +462,9 @@
         },
       });
 
-      /* kartunya naik-turun berlawanan supaya barisannya terasa berlapis */
-      cards.forEach((card, i) => {
-        const dir = i % 2 ? 1 : -1;
-        gsap.fromTo(
-          card,
-          { y: 14 * dir },
-          {
-            y: -14 * dir,
-            ease: "none",
-            scrollTrigger: {
-              trigger: stage,
-              start: "top top",
-              end: () => "+=" + distance(),
-              scrub: true,
-            },
-          },
-        );
-      });
     }
   }
 
-  /* ------------------------------------------------------------------------
-     LIGHTBOX SERTIFIKAT
-     <dialog> yang menangani Esc, backdrop, dan pengembalian fokus sendiri.
-     Kalau browser-nya tidak mendukung showModal(), gambarnya dibuka di tab baru.
-  ------------------------------------------------------------------------ */
   (() => {
     const box = $("[data-lightbox]");
     const cards = $$("[data-cert-card]").filter((c) => c.dataset.full);
@@ -602,7 +486,7 @@
       title.textContent = card.dataset.title || "";
       meta.textContent = card.dataset.meta || "";
       if (count) count.textContent = pad(current + 1) + " / " + pad(cards.length);
-      /* putar ulang animasi masuk gambar saat pindah sertifikat */
+
       img.style.animation = "none";
       void img.offsetWidth;
       img.style.animation = "";
@@ -631,7 +515,6 @@
       if (e.key === "ArrowRight") show(current + 1);
     });
 
-    /* klik di area kosong (bukan gambar / tombol) juga menutup */
     box.addEventListener("click", (e) => {
       if (e.target === box || e.target.classList.contains("lightbox__stage")) box.close();
     });
@@ -642,9 +525,6 @@
     });
   })();
 
-  /* ------------------------------------------------------------------------
-     WORKS — preview project yang mengikuti kursor
-  ------------------------------------------------------------------------ */
   const workList = $("[data-work-list]");
   const preview = $("[data-work-preview]");
 
@@ -653,15 +533,10 @@
     const toX = gsap.quickTo(preview, "x", { duration: 0.55, ease: "power3" });
     const toY = gsap.quickTo(preview, "y", { duration: 0.55, ease: "power3" });
     let current = -1;
-    let pointer = null; // posisi kursor terakhir (clientX/Y)
+    let pointer = null;
 
     gsap.set(preview, { scale: 0.82 });
 
-    /* BUG LAMA: posisi preview cuma di-update saat pointermove. Kalau baris
-       didatangi tanpa gerak mouse (mis. sambil scroll) atau saat pertama kali,
-       preview muncul di posisi lamanya — awalnya (0,0), alias pojok kiri atas.
-       Sekarang: saat muncul, preview LANGSUNG ditaruh di kursor (tanpa
-       meluncur), dan ikut dicek ulang tiap scroll. */
     const follow = (x, y, snap) => {
       const tx = x - preview.offsetWidth / 2;
       const ty = y - preview.offsetHeight / 2;
@@ -685,7 +560,7 @@
       const index = Number(row.dataset.work);
       if (index === current) return;
       const slide = slides[index];
-      /* project tanpa gambar preview -> jangan munculkan kotak kosong */
+
       if (!slide) return hide();
       const wasHidden = current === -1;
       current = index;
@@ -720,8 +595,6 @@
 
     workList.addEventListener("pointerleave", hide);
 
-    /* saat di-scroll kursornya diam tapi barisnya bergerak: cek elemen di
-       bawah kursor, lalu ganti / sembunyikan preview sesuai itu */
     addEventListener(
       "scroll",
       () => {
@@ -735,9 +608,6 @@
     );
   }
 
-  /* ------------------------------------------------------------------------
-     CONTACT & FOOTER — footer naik seperti tirai, contact-nya tenggelam
-  ------------------------------------------------------------------------ */
   if (hasST && !reduce) {
     const footer = $(".site-footer");
     const contactKids = $$("#contact > *");
@@ -747,7 +617,7 @@
         yPercent: -6,
         opacity: 0.5,
         ease: "none",
-        /* footer-nya tidak setinggi layar, jadi selesainya di dasar halaman */
+
         scrollTrigger: {
           trigger: footer,
           start: "top bottom",
@@ -759,16 +629,6 @@
 
   }
 
-  /* ------------------------------------------------------------------------
-     SIGNATURE — tanda tangan di section contact "menulis sendiri".
-     Tiap <path> adalah jalur-tengah satu goresan (hasil tracing logo), di
-     dalam mask logo asli. Goresannya digambar berurutan pakai
-     stroke-dashoffset (pathLength=1, jadi 1 = tersembunyi, 0 = penuh) dengan
-     durasi sebanding panjangnya, lalu logo penuh di-fade untuk menutup
-     sambungan kecil yang tidak terjangkau goresan.
-     Mulai saat section masuk layar; di-reset kalau di-scroll balik ke atas,
-     jadi bisa ditonton ulang.
-  ------------------------------------------------------------------------ */
   (() => {
     const svg = $("[data-sign-draw]");
     if (!svg || !hasGsap || reduce) return;
@@ -776,7 +636,7 @@
     const strokes = $$("path", svg);
     const fill = $("[data-sign-fill]", svg);
     const total = strokes.reduce((t, p) => t + (+p.dataset.len || 1), 0);
-    const DRAW = 2.6; // detik untuk seluruh tanda tangan
+    const DRAW = 2.6;
 
     gsap.set(strokes, { strokeDasharray: "1 1", strokeDashoffset: 1, visibility: "hidden" });
     gsap.set(fill, { opacity: 0 });
@@ -800,9 +660,6 @@
     }
   })();
 
-  /* ------------------------------------------------------------------------
-     TOMBOL MAGNET — ikut tertarik ke arah kursor
-  ------------------------------------------------------------------------ */
   if (canHover && !reduce) {
     $$("[data-magnetic]").forEach((el) => {
       const pull = 0.34;
@@ -823,110 +680,6 @@
     });
   }
 
-  /* ------------------------------------------------------------------------
-     MENU OVERLAY
-     Panelnya tersingkap lewat clip-path lingkaran yang membesar dari posisi
-     tombol menu, jadi pusat lingkarannya dihitung ulang tiap kali dibuka
-     (dan saat layar berubah ukuran).
-
-     Aksesibilitas: panel diberi `inert` selagi tertutup supaya isinya tidak
-     bisa di-tab; Esc menutup; fokus dibawa ke item pertama saat dibuka dan
-     dikembalikan ke tombol saat ditutup.
-  ------------------------------------------------------------------------ */
-  (() => {
-    const panel = $("[data-menu]");
-    const toggle = $("[data-menu-toggle]");
-    if (!panel || !toggle) return;
-
-    const label = $("[data-menu-label]", toggle);
-    const links = $$("[data-menu-link]", panel);
-    let open = false;
-
-    /* pusat lingkaran = titik tengah tombol, dalam persen layar */
-    const placeOrigin = () => {
-      const r = toggle.getBoundingClientRect();
-      panel.style.setProperty("--menu-x", `${((r.left + r.width / 2) / innerWidth) * 100}%`);
-      panel.style.setProperty("--menu-y", `${((r.top + r.height / 2) / innerHeight) * 100}%`);
-    };
-
-    const setOpen = (next) => {
-      if (next === open) return;
-      open = next;
-
-      if (open) placeOrigin();
-      panel.classList.toggle("is-open", open);
-      html.classList.toggle("is-menu-open", open);
-      toggle.setAttribute("aria-expanded", String(open));
-      if (label) label.textContent = open ? "Close menu" : "Open menu";
-
-      if (open) {
-        panel.removeAttribute("inert");
-        if (lenis) lenis.stop();
-        links[0]?.focus({ preventScroll: true });
-      } else {
-        /* fokus dikembalikan dulu, baru di-inert — kalau terbalik, fokusnya
-           lompat ke <body> dan posisi scroll bisa ikut meloncat */
-        if (panel.contains(document.activeElement)) toggle.focus({ preventScroll: true });
-        panel.setAttribute("inert", "");
-        if (lenis) lenis.start();
-      }
-    };
-
-    toggle.addEventListener("click", () => setOpen(!open));
-
-    /* selama menu terbuka, scroll apa pun (roda mouse, swipe) dibuang —
-       baik di panel menu maupun halaman di belakangnya */
-    const blockScroll = (e) => {
-      if (open) e.preventDefault();
-    };
-    addEventListener("wheel", blockScroll, { passive: false });
-    addEventListener("touchmove", blockScroll, { passive: false });
-
-    addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && open) setOpen(false);
-    });
-
-    /* Link di dalam menu: TUTUP DULU, BARU SCROLL.
-       Selama menu terbuka Lenis di-stop(), dan Lenis membuang perintah
-       scrollTo() yang datang saat sedang stop — itu sebabnya dulu klik link
-       cuma menutup menu tanpa pindah section. setOpen(false) menyalakan Lenis
-       lagi, baru setelah itu goTo() dipanggil. */
-    links.forEach((link) => {
-      link.addEventListener("click", (e) => {
-        const target = document.querySelector(link.getAttribute("href") || "");
-        if (!target) return;
-        e.preventDefault();
-        setOpen(false);
-        goTo(target);
-        history.replaceState(null, "", link.getAttribute("href"));
-      });
-    });
-
-    /* tandai link section yang sedang dilihat (aria-current) */
-    if (hasST) {
-      links.forEach((link) => {
-        const section = document.querySelector(link.getAttribute("href") || "");
-        if (!section) return;
-        ScrollTrigger.create({
-          trigger: section,
-          start: "top 50%",
-          end: "bottom 50%",
-          onToggle: (self) => {
-            if (!self.isActive) return;
-            links.forEach((l) => l.setAttribute("aria-current", String(l === link)));
-          },
-        });
-      });
-    }
-
-    addEventListener("resize", () => open && placeOrigin());
-    placeOrigin();
-
-  })();
-
-  /* ------------------------------------------------------------------------
-     JAM LOKAL
-  ------------------------------------------------------------------------ */
   const clocks = $$("[data-clock]");
 
   if (clocks.length) {
@@ -944,9 +697,25 @@
     setInterval(tick, 15000);
   }
 
-  /* ------------------------------------------------------------------------
-     PENYESUAIAN ULANG — font selesai dimuat / layar berubah ukuran
-  ------------------------------------------------------------------------ */
+  const scrawls = $$("[data-scrawl]");
+
+  if (scrawls.length) {
+    if (reduce || !("IntersectionObserver" in window)) {
+      scrawls.forEach((s) => s.classList.add("is-drawn"));
+    } else {
+      const io = new IntersectionObserver(
+        (entries) =>
+          entries.forEach((e) => {
+            if (!e.isIntersecting) return;
+            e.target.classList.add("is-drawn");
+            io.unobserve(e.target);
+          }),
+        { threshold: 0.6 },
+      );
+      scrawls.forEach((s) => io.observe(s));
+    }
+  }
+
   if (hasST) {
     document.fonts?.ready.then(() => ScrollTrigger.refresh());
 

@@ -1,35 +1,28 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Fakeeh — Portfolio</title>
+    <title>Muhammad Fakhril Fakih – Full-Stack Web Engineer</title>
     <meta
       name="description"
       content="Portfolio of Muhammad Fakhril Fakih — designer & web developer working across UI/UX, front-end, and interaction."
     />
     <meta name="theme-color" content="#461113" />
     <link rel="icon" type="image/png" href="./src/assets/favicon.png" />
-
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Poppins:wght@400;600;700;800;900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Permanent+Marker&family=Poppins:wght@400;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-
     <link rel="stylesheet" href="./dist/output.css" />
-
-    <!-- Penanda "JS hidup". Elemen yang cuma berguna dengan JS (preloader,
-         menu, preview) disembunyikan kalau class ini tidak ada — lihat
-         html:not(.js) di src/input.css. -->
     <script>
       document.documentElement.classList.add("js");
     </script>
   </head>
-
   <body>
-    <!-- sprite ikon: tanda * khas landing page, dipakai di marquee -->
+    <!-- //// ICON SPRITE //// -->
     <svg width="0" height="0" aria-hidden="true" style="position: absolute">
       <defs>
         <g id="i-asterisk">
@@ -42,11 +35,7 @@
         </g>
       </defs>
     </svg>
-
-    <!-- =====================================================================
-         PRELOADER — tanda tangan "ditulis" (lihat .sign-ink), angka 0→100,
-         lalu panelnya diangkat ke atas
-    ====================================================================== -->
+    <!-- //// PRELOADER //// -->
     <div class="loader" data-loader>
       <div class="loader__inner">
         <span class="loader__mark sign-ink" data-loader-mark aria-hidden="true"></span>
@@ -54,101 +43,22 @@
         <p class="loader__count"><span data-loader-count>0</span>%</p>
       </div>
     </div>
-
-    <!-- =====================================================================
-         TOPBAR — pil melayang yang baru muncul setelah halaman di-scroll
-         (lihat modul "TOPBAR" di main.js). Juga muncul kalau salah satu
-         isinya kena fokus keyboard, jadi tetap bisa dijangkau dari atas.
-    ====================================================================== -->
-    <header class="topbar" data-topbar>
-      <div class="topbar__pill">
-        <a href="#hero" class="topbar__brand" data-nav-link aria-label="Fakeeh — back to top">
-          <span class="topbar__logo logo-mark" aria-hidden="true"></span>
-        </a>
-
-        <button
-          class="burger"
-          data-menu-toggle
-          type="button"
-          aria-expanded="false"
-          aria-controls="site-menu"
-        >
-          <span class="sr-only" data-menu-label>Open menu</span>
-          <span class="burger__line" aria-hidden="true"></span>
-          <span class="burger__line" aria-hidden="true"></span>
-        </button>
-      </div>
-    </header>
-
-    <!-- =====================================================================
-         MENU — panel full-screen ber-blur yang tersingkap lewat clip-path
-         lingkaran dari posisi tombol menu (pusatnya diisi JS ke --menu-x/-y).
-         Isinya sengaja cuma link. data-lenis-prevent: kalau menunya lebih
-         tinggi dari layar, scroll di dalamnya tidak dibajak Lenis.
-    ====================================================================== -->
-    <div class="menu" id="site-menu" data-menu data-lenis-prevent inert>
-      <nav aria-label="Main">
-        <ul>
-          <li class="menu__row" style="--i: 0">
-            <a class="menu__link" href="#hero" data-menu-link>
-              <span class="menu__label">home</span>
-              <svg class="menu__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10" /></svg>
-            </a>
-          </li>
-          <li class="menu__row" style="--i: 1">
-            <a class="menu__link" href="#about" data-menu-link>
-              <span class="menu__label">about</span>
-              <svg class="menu__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10" /></svg>
-            </a>
-          </li>
-          <li class="menu__row" style="--i: 2">
-            <a class="menu__link" href="#achievements" data-menu-link>
-              <span class="menu__label">achievements</span>
-              <svg class="menu__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10" /></svg>
-            </a>
-          </li>
-          <li class="menu__row" style="--i: 3">
-            <a class="menu__link" href="#works" data-menu-link>
-              <span class="menu__label">work</span>
-              <svg class="menu__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10" /></svg>
-            </a>
-          </li>
-          <li class="menu__row" style="--i: 4">
-            <a class="menu__link" href="#contact" data-menu-link>
-              <span class="menu__label">contact</span>
-              <svg class="menu__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10" /></svg>
-            </a>
-          </li>
-        </ul>
-      </nav>
-    </div>
-
-    <!-- =====================================================================
-         HERO — sticky. Dia diam di tempat, lalu <main> di bawahnya naik
-         menutupi. Tinggi panggungnya 1 layar penuh, tapi kartu hero-nya
-         sendiri tidak fullscreen: ada bidang gelap di atas + sudut atas membulat.
-    ====================================================================== -->
+    <!-- //// HERO //// -->
     <div
       id="hero"
       data-theme="light"
-      class="sticky top-0 z-0 flex h-svh flex-col bg-ink pt-[46px] pb-[20px] mx-7"
-    >
+      class="sticky top-0 z-0 flex h-svh flex-col bg-ink pt-[46px] pb-[20px] mx-7">
       <section
         class="hero-card relative flex-1 overflow-hidden bg-cream"
         data-hero-card
-        aria-label="Intro"
-      >
-        <!-- ukuran font: lihat .hero-title di src/input.css (ikut lebar kartu) -->
+        aria-label="Intro">
+        <span class="tag tag--hero" style="--r: -5deg" aria-hidden="true">est. 2023 — bdg</span>
         <h1
           class="hero-title absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-display leading-[0.8] tracking-[-0.01em] whitespace-nowrap text-maroon"
           data-hero-title
-          data-split="chars"
-        >
+          data-split="chars">
           PORTFOLIO
         </h1>
-
-        <!-- Ekspor frame "23 2" (node 42:125) dari Figma → src/assets/.
-             Wrapper-nya yang digeser: parallax scroll + miring ikut kursor. -->
         <div class="absolute inset-0 z-10" data-hero-portrait aria-hidden="true">
           <div class="absolute inset-0" data-hero-tilt>
             <img
@@ -158,17 +68,9 @@
             />
           </div>
         </div>
-
-        <!-- baris bawah: peran di kiri, tombol scroll di kanan.
-             pb-nya >100px karena <main> naik 100px (-mt-[100px]) menutupi
-             bagian bawah kartu ini sejak awal. -->
         <div
-          class="absolute inset-x-0 bottom-0 z-20 flex items-end justify-between gap-4 px-[clamp(16px,2.6vw,38px)] pb-[112px]"
-        >
-          <!-- di HP fotonya menutupi area ini, jadi labelnya disembunyikan -->
-          <p class="hero-meta hidden sm:block" data-anim="up">designer &amp; web developer</p>
-
-          <a href="#about" class="scroll-cue ml-auto" data-nav-link data-anim="pop">
+          class="absolute inset-x-0 bottom-0 z-20 flex items-end justify-between gap-4 px-[clamp(16px,2.6vw,38px)] pb-[112px]">
+          <a href="#about" class="scroll-cue" data-nav-link data-anim="pop">
             scroll
             <svg class="scroll-cue__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M12 4v15" />
@@ -178,14 +80,8 @@
         </div>
       </section>
     </div>
-
-    <!-- =====================================================================
-         ISI HALAMAN — z-10, jadi dia yang naik menutupi hero saat di-scroll
-    ====================================================================== -->
     <main class="relative z-10 -mt-[100px]">
-      <!-- dua pita marquee raksasa yang menyilang, warnanya berlawanan
-           (maroon vs cream) dan jalannya berlawanan arah. Ini tirai pertama
-           yang naik menutupi kartu hero. Gaya: .cross-marquee di input.css -->
+      <!-- //// CROSS MARQUEE //// -->
       <div class="cross-marquee" aria-hidden="true">
         <div class="marquee cross-marquee__a" data-marquee data-speed="0.6">
           <div class="marquee__track" data-marquee-track>
@@ -210,30 +106,26 @@
           </div>
         </div>
       </div>
-
-      <!-- =================================================================
-           ABOUT — kolom kiri menempel (sticky), kolom kanan jalan terus.
-           Paragrafnya terang kata per kata mengikuti scroll.
-      ================================================================== -->
+      <!-- //// ABOUT //// -->
       <section
         id="about"
         data-theme="light"
-        class="bg-paper px-[clamp(18px,3.4vw,46px)] pt-[clamp(72px,10vw,160px)] pb-[clamp(80px,12vw,190px)]"
-      >
-        <div class="mx-auto max-w-[1350px]">
+        class="bg-paper px-[clamp(18px,3.4vw,46px)] pt-[clamp(72px,10vw,160px)] pb-[clamp(80px,12vw,190px)]">
+        <div class="relative mx-auto max-w-[1350px]">
+          <span
+            class="sticker sticker--ink absolute right-0 top-[clamp(40px,6vw,96px)] hidden sm:inline-block"
+            style="--r: 6deg"
+            aria-hidden="true"
+            data-anim="pop"
+          >no templates.<br />hand-made only.</span>
           <p class="eyebrow text-clay" data-anim="up">01 — about</p>
-
           <h2
             class="mt-[clamp(16px,2.2vw,30px)] font-black lowercase text-[clamp(44px,9.4vw,128px)] leading-[0.86] tracking-[-0.06em] text-maroon"
-            data-split="words"
-          >
+            data-split="words">
             who knows me
           </h2>
-
           <div
-            class="mt-[clamp(34px,5vw,78px)] grid gap-[clamp(28px,4vw,62px)] lg:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)]"
-          >
-            <!-- kiri: foto dengan parallax di dalam mask-nya -->
+            class="mt-[clamp(34px,5vw,78px)] grid gap-[clamp(28px,4vw,62px)] lg:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)]">
             <div class="lg:sticky lg:top-[13vh] lg:self-start">
               <div class="media-mask aspect-[4/5] w-full" data-parallax-mask>
                 <img
@@ -245,23 +137,16 @@
                 />
               </div>
             </div>
-
-            <!-- kanan -->
             <div>
               <p
                 class="fade-words text-[clamp(18px,2.45vw,33px)] leading-[1.3] tracking-[-0.045em] text-maroon"
                 data-split="words"
-                data-fade-words
-              >
+                data-fade-words>
                 Hi, I'm Muhammad Fakhril Fakih, a passionate Designer and Web Developer who
                 bridges the gap between stunning visuals and clean code. I specialize in
                 crafting intuitive user experiences and bringing them to life through
                 responsive, modern web development.
               </p>
-
-              <!-- Angka singkat. Labelnya di <dt>, angkanya di <dd>; CSS
-                   menukar urutan tampilnya supaya angka ada di atas.
-                   Silakan sesuaikan angkanya sendiri (data-count). -->
               <dl class="stats mt-[clamp(40px,5vw,76px)]">
                 <div class="stat" data-anim="up">
                   <dt class="stat__label">years learning</dt>
@@ -273,14 +158,11 @@
                 </div>
                 <div class="stat" data-anim="up">
                   <dt class="stat__label">certificates</dt>
-                  <dd class="stat__num" data-count="5" data-count-suffix="">0</dd>
+                  <dd class="stat__num" data-count="7" data-count-suffix="">0</dd>
                 </div>
               </dl>
-
               <div class="mt-[clamp(40px,5vw,76px)]">
                 <h3 class="eyebrow mb-[clamp(14px,2vw,24px)] text-clay">what i do</h3>
-                <!-- barisnya masuk dari kiri/kanan, jadi dikurung di sini supaya
-                     tidak bikin halaman bisa di-scroll ke samping -->
                 <ul class="overflow-x-clip">
                   <li class="skill" data-slide="left">
                     <span class="skill__name">interface design</span>
@@ -304,11 +186,7 @@
           </div>
         </div>
       </section>
-
-      <!-- =================================================================
-           ACHIEVEMENTS — panggung di-pin, lalu kartunya digeser ke samping
-           mengikuti scroll vertikal. Lihat modul "cert" di src/js/main.js.
-      ================================================================== -->
+      <!-- //// ACHIEVEMENTS //// -->
       <section id="achievements" data-theme="dark" data-cert aria-labelledby="achievements-title">
         <div class="cert-stage" data-cert-stage>
           <div class="cert-head">
@@ -317,200 +195,190 @@
               <h2
                 id="achievements-title"
                 class="mt-[clamp(10px,1.4vw,18px)] font-black lowercase text-[clamp(34px,6.4vw,92px)] leading-[0.86] tracking-[-0.06em]"
-                data-split="words"
-              >
+                data-split="words">
                 certified &amp; counting
               </h2>
             </div>
           </div>
-
           <div class="cert-viewport" data-cert-viewport>
             <div class="cert-track" data-cert-track>
-              <!-- panel pembuka -->
-              <div class="cert-panel">
-                <p class="text-[clamp(16px,1.9vw,24px)] leading-[1.35] tracking-[-0.035em] text-cream/75">
-                  Every certificate here marks a skill I can now actually ship with — not
-                  just a piece of paper.
-                </p>
-                <p class="eyebrow mt-[clamp(16px,2.4vw,30px)] text-cream/60">
-                  click a card to view it
-                </p>
-              </div>
-
-              <!--
-                Kartu sertifikat. Kartunya cuma menampilkan sampul (singkatan
-                skill di atas warna); gambar sertifikatnya baru dimuat & tampil
-                di lightbox saat kartu diklik. Data untuk lightbox:
-                  data-full   -> file gambar sertifikat
-                  data-title  -> judul di lightbox
-                  data-meta   -> penerbit · tanggal · nomor sertifikat
-                  data-alt    -> alt text gambar di lightbox
-                Sampul: --fit = ukuran huruf singkatan (makin panjang katanya,
-                makin kecil angkanya), modifier --maroon/--clay/--ink = warna.
-                Urutannya kronologis sesuai tanggal terbit.
-              -->
               <article
                 class="cert-card"
                 data-cert-card
                 data-full="./src/assets/sertifikat/html.jpg"
                 data-title="Introduction to HTML"
                 data-meta="Sololearn · 27 July 2026 · CC-JNFASKDJ"
-                data-alt="Sololearn Introduction to HTML certificate awarded to Muhammad Fakhril Fakih"
-              >
-                <div class="cert-card__top">
-                  <span>01 / sololearn</span>
-                  <span>jul 2026</span>
-                </div>
-                <div class="cert-card__cover" style="--fit: 44cqw" aria-hidden="true">
-                  <span class="cert-card__stamp">certificate</span>
+                data-alt="Sololearn Introduction to HTML certificate awarded to Muhammad Fakhril Fakih">
+                <div class="cert-card__cover" style="--fit: 38cqw" aria-hidden="true">
+                  <span class="cert-card__no">#01</span>
                   <span class="cert-card__abbr">html</span>
-                  <span class="cert-card__view">view ↗</span>
                 </div>
-                <h3 class="cert-card__title">introduction to html</h3>
-                <p class="cert-card__desc">Document structure, semantic HTML, and accessibility basics.</p>
+                <div class="cert-card__foot">
+                  <h3 class="cert-card__title">intro to html</h3>
+                  <span class="cert-card__arrow" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10" /></svg>
+                  </span>
+                </div>
                 <button class="cert-card__open" type="button" data-cert-open>
                   <span class="sr-only">View the Introduction to HTML certificate</span>
                 </button>
               </article>
-
               <article
                 class="cert-card"
                 data-cert-card
                 data-full="./src/assets/sertifikat/css.jpg"
                 data-title="Introduction to CSS"
                 data-meta="Sololearn · 31 July 2026 · CC-ZRBN6QPO"
-                data-alt="Sololearn Introduction to CSS certificate awarded to Muhammad Fakhril Fakih"
-              >
-                <div class="cert-card__top">
-                  <span>02 / sololearn</span>
-                  <span>jul 2026</span>
-                </div>
+                data-alt="Sololearn Introduction to CSS certificate awarded to Muhammad Fakhril Fakih">
                 <div class="cert-card__cover" style="--fit: 56cqw" aria-hidden="true">
-                  <span class="cert-card__stamp">certificate</span>
+                  <span class="cert-card__no">#02</span>
                   <span class="cert-card__abbr">css</span>
-                  <span class="cert-card__view">view ↗</span>
                 </div>
-                <h3 class="cert-card__title">introduction to css</h3>
-                <p class="cert-card__desc">Responsive layout, selectors, and consistent color systems.</p>
+                <div class="cert-card__foot">
+                  <h3 class="cert-card__title">intro to css</h3>
+                  <span class="cert-card__arrow" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10" /></svg>
+                  </span>
+                </div>
                 <button class="cert-card__open" type="button" data-cert-open>
                   <span class="sr-only">View the Introduction to CSS certificate</span>
                 </button>
               </article>
-
               <article
                 class="cert-card"
                 data-cert-card
                 data-full="./src/assets/sertifikat/web-development.jpg"
                 data-title="Web Development"
                 data-meta="Sololearn · 5 August 2026 · CC-WVH5PNSJ"
-                data-alt="Sololearn Web Development certificate awarded to Muhammad Fakhril Fakih"
-              >
-                <div class="cert-card__top">
-                  <span>03 / sololearn</span>
-                  <span>aug 2026</span>
-                </div>
+                data-alt="Sololearn Web Development certificate awarded to Muhammad Fakhril Fakih">
                 <div class="cert-card__cover" style="--fit: 52cqw" aria-hidden="true">
-                  <span class="cert-card__stamp">certificate</span>
+                  <span class="cert-card__no">#03</span>
                   <span class="cert-card__abbr">web</span>
-                  <span class="cert-card__view">view ↗</span>
                 </div>
-                <h3 class="cert-card__title">web development</h3>
-                <p class="cert-card__desc">From markup to a website that actually runs in the browser.</p>
+                <div class="cert-card__foot">
+                  <h3 class="cert-card__title">web development</h3>
+                  <span class="cert-card__arrow" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10" /></svg>
+                  </span>
+                </div>
                 <button class="cert-card__open" type="button" data-cert-open>
                   <span class="sr-only">View the Web Development certificate</span>
                 </button>
               </article>
-
               <article
                 class="cert-card"
                 data-cert-card
                 data-full="./src/assets/sertifikat/javascript.png"
                 data-title="Introduction to JavaScript"
                 data-meta="Sololearn · 6 November 2026 · CC-4NZZNCSJ"
-                data-alt="Sololearn Introduction to JavaScript certificate awarded to Muhammad Fakhril Fakih"
-              >
-                <div class="cert-card__top">
-                  <span>04 / sololearn</span>
-                  <span>nov 2026</span>
-                </div>
+                data-alt="Sololearn Introduction to JavaScript certificate awarded to Muhammad Fakhril Fakih">
                 <div class="cert-card__cover" style="--fit: 74cqw" aria-hidden="true">
-                  <span class="cert-card__stamp">certificate</span>
+                  <span class="cert-card__no">#04</span>
                   <span class="cert-card__abbr">js</span>
-                  <span class="cert-card__view">view ↗</span>
                 </div>
-                <h3 class="cert-card__title">introduction to javascript</h3>
-                <p class="cert-card__desc">Logic, the DOM, and making pages come alive — used on this very site.</p>
+                <div class="cert-card__foot">
+                  <h3 class="cert-card__title">intro to javascript</h3>
+                  <span class="cert-card__arrow" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10" /></svg>
+                  </span>
+                </div>
                 <button class="cert-card__open" type="button" data-cert-open>
                   <span class="sr-only">View the Introduction to JavaScript certificate</span>
                 </button>
               </article>
-
               <article
                 class="cert-card"
                 data-cert-card
                 data-full="./src/assets/sertifikat/prompt-engineering.jpg"
                 data-title="Prompt Engineering"
                 data-meta="Sololearn · 6 November 2026 · CC-L3SV56XG"
-                data-alt="Sololearn Prompt Engineering certificate awarded to Muhammad Fakhril Fakih"
-              >
-                <div class="cert-card__top">
-                  <span>05 / sololearn</span>
-                  <span>nov 2026</span>
-                </div>
+                data-alt="Sololearn Prompt Engineering certificate awarded to Muhammad Fakhril Fakih">
                 <div class="cert-card__cover" style="--fit: 30cqw" aria-hidden="true">
-                  <span class="cert-card__stamp">certificate</span>
+                  <span class="cert-card__no">#05</span>
                   <span class="cert-card__abbr">prompt</span>
-                  <span class="cert-card__view">view ↗</span>
                 </div>
-                <h3 class="cert-card__title">prompt engineering</h3>
-                <p class="cert-card__desc">Writing instructions for AI that get focused results, not guesses.</p>
+                <div class="cert-card__foot">
+                  <h3 class="cert-card__title">prompt engineering</h3>
+                  <span class="cert-card__arrow" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10" /></svg>
+                  </span>
+                </div>
                 <button class="cert-card__open" type="button" data-cert-open>
                   <span class="sr-only">View the Prompt Engineering certificate</span>
                 </button>
               </article>
-
-              <!-- panel penutup -->
-              <div class="cert-panel">
-                <h3 class="font-black lowercase text-[clamp(30px,4.6vw,64px)] leading-[0.88] tracking-[-0.06em]">
-                  still<br />counting.
-                </h3>
-                <a href="#works" class="link-line eyebrow mt-[clamp(16px,2.4vw,30px)] text-cream/75" data-nav-link>see the work</a>
-              </div>
+              <article
+                class="cert-card"
+                data-cert-card
+                data-full="./src/assets/sertifikat/vibe-coding.jpg"
+                data-title="Vibe Coding"
+                data-meta="Sololearn · 10 November 2026 · CC-I7PUXOHE"
+                data-alt="Sololearn Vibe Coding certificate awarded to Muhammad Fakhril Fakih">
+                <div class="cert-card__cover" style="--fit: 44cqw" aria-hidden="true">
+                  <span class="cert-card__no">#06</span>
+                  <span class="cert-card__abbr">vibe</span>
+                </div>
+                <div class="cert-card__foot">
+                  <h3 class="cert-card__title">vibe coding</h3>
+                  <span class="cert-card__arrow" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10" /></svg>
+                  </span>
+                </div>
+                <button class="cert-card__open" type="button" data-cert-open>
+                  <span class="sr-only">View the Vibe Coding certificate</span>
+                </button>
+              </article>
+              <article
+                class="cert-card"
+                data-cert-card
+                data-full="./src/assets/sertifikat/generative-ai.jpg"
+                data-title="Generative AI in Practice"
+                data-meta="Sololearn · 10 November 2026 · CC-ETB3Q1JE"
+                data-alt="Sololearn Generative AI in Practice certificate awarded to Muhammad Fakhril Fakih">
+                <div class="cert-card__cover" style="--fit: 34cqw" aria-hidden="true">
+                  <span class="cert-card__no">#07</span>
+                  <span class="cert-card__abbr">gen ai</span>
+                </div>
+                <div class="cert-card__foot">
+                  <h3 class="cert-card__title">generative ai</h3>
+                  <span class="cert-card__arrow" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10" /></svg>
+                  </span>
+                </div>
+                <button class="cert-card__open" type="button" data-cert-open>
+                  <span class="sr-only">View the Generative AI in Practice certificate</span>
+                </button>
+              </article>
             </div>
           </div>
-
           <div class="cert-bar">
-            <span class="tabular-nums" data-cert-count>01 / 05</span>
+            <span class="tabular-nums" data-cert-count>01 / 07</span>
             <span class="cert-bar__rail" aria-hidden="true"><i data-cert-rail></i></span>
-            <span class="hidden sm:inline">scroll ↓ = slide →</span>
           </div>
         </div>
       </section>
-
-      <!-- =================================================================
-           WORKS — daftar index gaya awwwards. Di layar berkursor, hover
-           baris memunculkan preview yang mengikuti kursor; grid thumbnail
-           di bawahnya khusus layar sentuh.
-      ================================================================== -->
+      <!-- //// WORKS //// -->
       <section
         id="works"
         data-theme="light"
-        class="bg-paper px-[clamp(18px,3.4vw,46px)] pt-[clamp(76px,10vw,160px)] pb-[clamp(56px,8vw,120px)]"
-      >
+        class="bg-paper px-[clamp(18px,3.4vw,46px)] pt-[clamp(76px,10vw,160px)] pb-[clamp(56px,8vw,120px)]">
         <div class="mx-auto max-w-[1350px]">
           <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
             <p class="eyebrow text-clay" data-anim="up">03 — selected work</p>
             <p class="hero-meta" data-anim="up">3 projects · 2024—2026</p>
           </div>
-
-          <h2
-            class="mt-[clamp(16px,2.2vw,30px)] font-extrabold lowercase text-[clamp(44px,9.4vw,128px)] leading-[0.86] tracking-[-0.06em] text-maroon"
-            data-split="words"
-          >
-            portfolio
-          </h2>
-
-          <!-- Arkam Web belum ada link live-nya; ganti href="#" kalau sudah ada. -->
+          <div class="relative mt-[clamp(16px,2.2vw,30px)] w-fit">
+            <h2
+              class="font-extrabold lowercase text-[clamp(44px,9.4vw,128px)] leading-[0.86] tracking-[-0.06em] text-maroon"
+              data-split="words">
+              portfolio
+            </h2>
+            <svg class="scrawl scrawl--under" viewBox="0 0 600 40" preserveAspectRatio="none" aria-hidden="true" data-scrawl>
+              <path pathLength="1" d="M8 24 C 120 8, 250 34, 380 16 S 548 12, 594 20" />
+              <path pathLength="1" d="M46 34 C 190 22, 330 38, 528 26" />
+            </svg>
+            <span class="tag tag--side hidden sm:block" style="--r: -9deg" aria-hidden="true">more soon, promise ↗</span>
+          </div>
           <ul class="work-list mt-[clamp(34px,5vw,78px)]" data-work-list>
             <li>
               <a class="work-row" href="https://arkamezxe.github.io/portofolio/" target="_blank" rel="noopener noreferrer" data-work="0">
@@ -541,12 +409,9 @@
               </a>
             </li>
           </ul>
-
-          <!-- Kartu besar — khusus layar sentuh (lihat .work-grid di input.css). -->
         </div>
       </section>
-
-      <!-- jembatan ke contact: teks raksasa yang diam di tempat -->
+      <!-- //// CONTACT TRANSITION //// -->
       <div class="bg-paper px-[clamp(18px,3.4vw,46px)] pb-[clamp(60px,9vw,150px)] text-maroon" aria-hidden="true">
         <p class="talk-static">
           <span>let's talk</span>
@@ -554,22 +419,13 @@
         </p>
       </div>
     </main>
-
-    <!-- =====================================================================
-         CONTACT — sticky, jadi footer di bawahnya naik seperti tirai
-    ====================================================================== -->
+    <!-- //// CONTACT //// -->
     <section
       id="contact"
       data-theme="dark"
       class="sticky top-0 z-10 flex h-svh flex-col justify-between overflow-hidden bg-ink px-[clamp(18px,3.4vw,46px)] pt-[clamp(84px,9vw,110px)] pb-[clamp(40px,6vw,80px)] text-cream"
-      aria-labelledby="contact-title"
-    >
+      aria-labelledby="contact-title">
       <p class="eyebrow text-cream/70" data-anim="up">04 — contact</p>
-
-      <!-- tanda tangan di kanan "menulis sendiri" saat section ini masuk
-           layar (modul SIGNATURE di main.js). Path-nya hasil tracing dari
-           src/assets/logo-signature.png; logo aslinya jadi mask, jadi hasil
-           akhirnya selalu persis logo. -->
       <div class="contact-main">
         <h2 id="contact-title" class="contact-title" data-split="words">
           let's build something people remember
@@ -655,30 +511,24 @@
               </g>
             </svg>
       </div>
-
       <div class="flex flex-wrap items-end justify-between gap-[clamp(20px,3vw,40px)]">
-        <!-- ganti alamat email ini kalau mau pakai yang lain -->
         <a
           href="mailto:fakhrilfakih02@gmail.com"
-          class="swap w-fit text-[clamp(17px,2.6vw,38px)] font-extrabold tracking-[-0.045em] lowercase"
-        >
+          class="swap w-fit text-[clamp(17px,2.6vw,38px)] font-extrabold tracking-[-0.045em] lowercase">
           <span class="swap__a">fakhrilfakih02@gmail.com</span>
           <span class="swap__b" aria-hidden="true">send an email →</span>
         </a>
-
+        <span class="tag tag--cream" style="--r: -4deg" aria-hidden="true" data-anim="pop">← psst. i actually reply.</span>
       </div>
     </section>
-
-    <!-- =====================================================================
-         FOOTER — tirai cream yang naik menutupi contact (contact-nya sticky).
-    ====================================================================== -->
+    <!-- //// FOOTER //// -->
     <footer class="site-footer" data-theme="light">
       <div class="footer-main">
         <div>
           <p class="eyebrow text-clay" data-anim="up">05 — sign off</p>
           <h2 class="footer-title" data-split="words">thanks for scrolling all the way down.</h2>
+          <p class="tag mt-[clamp(14px,2vw,26px)] text-[clamp(18px,2.2vw,32px)]" style="--r: -7deg" aria-hidden="true" data-anim="pop">fakeeh was here ✗</p>
         </div>
-
         <ul class="footer-links">
           <li>
             <a class="footer-link" href="https://www.linkedin.com/in/muhammad-fakhril-fakih-6232743bb/" target="_blank" rel="noopener noreferrer">
@@ -700,7 +550,6 @@
           </li>
         </ul>
       </div>
-
       <div class="footer-bar">
         <p class="hero-meta">© 2026 muhammad fakhril fakih</p>
         <p class="hero-meta tabular-nums">bandung, id · <span data-clock>--:--</span> gmt+7</p>
@@ -712,9 +561,7 @@
         </a>
       </div>
     </footer>
-
-    <!-- preview project yang mengikuti kursor (desktop saja).
-         Urutan slide harus sama dengan data-work di daftar .work-list. -->
+    <!-- //// WORK PREVIEW //// -->
     <div class="work-preview" data-work-preview aria-hidden="true">
       <div class="work-preview__slide" data-work-slide="0">
         <img src="./src/assets/portofolio/arkamweb.jpeg" alt="" loading="lazy" decoding="async" />
@@ -726,24 +573,17 @@
         <img src="./src/assets/portofolio/7summit.png" alt="" loading="lazy" decoding="async" />
       </div>
     </div>
-
-    <!-- =====================================================================
-         LIGHTBOX SERTIFIKAT
-         <dialog> asli: Esc, backdrop, dan balik fokus ke tombol pemicu sudah
-         ditangani browser. Isinya diisi JS dari data-* milik kartu sertifikat.
-    ====================================================================== -->
+    <!-- //// CERTIFICATE LIGHTBOX //// -->
     <dialog class="lightbox" data-lightbox aria-labelledby="lightbox-title">
       <div class="lightbox__top">
-        <span class="lightbox__count tabular-nums" data-lightbox-count>01 / 05</span>
+        <span class="lightbox__count tabular-nums" data-lightbox-count>01 / 07</span>
         <button class="lightbox__btn" type="button" data-lightbox-close aria-label="Close">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
         </button>
       </div>
-
       <figure class="lightbox__stage">
         <img data-lightbox-img src="" alt="" />
       </figure>
-
       <div class="lightbox__bar">
         <div>
           <p class="lightbox__title" id="lightbox-title" data-lightbox-title></p>
@@ -759,7 +599,8 @@
         </div>
       </div>
     </dialog>
-
+    <!-- //// GRAIN //// -->
+    <div class="grain" aria-hidden="true"></div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js" defer></script>
