@@ -184,55 +184,146 @@
   }
 }
 
-/* //// PRELOADER //// */
+/* //// PRELOADER — split-curtain typography //// */
 @layer components {
+  /* Two ink curtains meet on a seam. The giant counter is rendered once in
+     each half and clipped by it, so the number itself tears apart on exit. */
   .loader {
     position: fixed;
     inset: 0;
     z-index: 90;
-    display: grid;
-    place-items: center;
+    background: var(--color-ink);
+    color: var(--color-cream);
+    /* Failsafe: if the script never runs, the curtain still lifts. */
+    animation: loader-failsafe 0.5s linear 8s forwards;
+  }
+
+  @keyframes loader-failsafe {
+    to {
+      opacity: 0;
+      visibility: hidden;
+    }
+  }
+
+  .loader__half {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 50%;
+    overflow: clip;
     background: var(--color-ink);
     will-change: transform;
   }
 
-  .loader__inner {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: clamp(18px, 3vw, 34px);
-    color: var(--color-cream);
+  .loader__half--top {
+    top: 0;
   }
 
-  .loader__mark {
-    height: clamp(120px, 26vh, 240px);
+  .loader__half--bottom {
+    bottom: 0;
   }
 
-  .loader__bar {
-    position: relative;
-    width: clamp(180px, 42vw, 420px);
-    height: 2px;
-    background: rgb(255 237 164 / 0.22);
-    overflow: clip;
-  }
-
-  .loader__bar i {
+  /* Each face spans the full loader, so both copies of the number sit on
+     exactly the same pixels and line up across the seam. */
+  .loader__face {
     position: absolute;
-    inset: 0;
-    background: var(--color-cream);
+    left: 0;
+    width: 100%;
+    height: 200%;
+    display: flex;
+    align-items: center;
+    padding-inline: clamp(18px, 3.4vw, 46px);
+  }
+
+  .loader__half--top .loader__face {
+    top: 0;
+  }
+
+  .loader__half--bottom .loader__face {
+    bottom: 0;
+  }
+
+  .loader__num {
+    display: flex;
+    align-items: flex-start;
+    /* Archivo Black, not the display face: Gondens DEMO ships without numerals. */
+    font-family: "Archivo Black", var(--font-body);
+    font-size: min(44vw, 70vh);
+    line-height: 0.8;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    /* Stays hidden until its font is in, so the digits never swap typeface. */
+    opacity: 0;
+    transition: opacity 0.4s linear;
+  }
+
+  .loader.is-live .loader__num {
+    opacity: 1;
+  }
+
+  .loader__num sup {
+    top: 0;
+    margin-left: 0.06em;
+    font-family: var(--font-body);
+    font-size: 0.13em;
+    font-weight: 800;
+    line-height: 1.5;
+    letter-spacing: 0;
+  }
+
+  .loader__note {
+    position: absolute;
+    font-size: clamp(9px, 1.05vw, 12px);
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgb(255 237 164 / 0.62);
+  }
+
+  .loader__note--tl,
+  .loader__note--tr {
+    top: clamp(16px, 2.4vw, 34px);
+  }
+
+  .loader__note--bl,
+  .loader__note--br {
+    bottom: clamp(16px, 2.4vw, 34px);
+  }
+
+  .loader__note--tl,
+  .loader__note--bl {
+    left: clamp(18px, 3.4vw, 46px);
+  }
+
+  .loader__note--tr,
+  .loader__note--br {
+    right: clamp(18px, 3.4vw, 46px);
+  }
+
+  .loader__note--bl {
+    rotate: -3deg;
+    font-family: var(--font-marker);
+    font-size: clamp(14px, 1.5vw, 22px);
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  /* The seam doubles as the progress bar. */
+  .loader__seam {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 2px;
+    margin-top: -1px;
+    background: rgb(255 237 164 / 0.55);
     transform: scaleX(0);
     transform-origin: 0 50%;
   }
 
-  .loader__count {
-    font-size: clamp(11px, 1.4vw, 14px);
-    font-weight: 800;
-    letter-spacing: 0.24em;
-    font-variant-numeric: tabular-nums;
-  }
-
   .loader.is-done {
-    pointer-events: none;
+    display: none;
   }
 }
 
@@ -249,6 +340,48 @@
   .hero-title .sp-w {
     overflow: visible;
     clip-path: inset(0);
+  }
+
+  .hero-name {
+    position: absolute;
+    z-index: 20;
+    top: clamp(50px, 7.4vw, 70px);
+    left: clamp(16px, 2.6vw, 38px);
+    color: var(--color-maroon);
+  }
+
+  @media (min-width: 640px) {
+    .hero-name {
+      top: clamp(16px, 2.4vw, 34px);
+      right: clamp(16px, 2.6vw, 38px);
+      left: auto;
+      text-align: right;
+    }
+  }
+
+  .hero-name__line {
+    display: block;
+    overflow: clip;
+    font-size: clamp(15px, 1.55vw, 23px);
+    font-weight: 900;
+    line-height: 1.15;
+    letter-spacing: -0.045em;
+    text-transform: lowercase;
+  }
+
+  .hero-name__line > span {
+    display: block;
+    will-change: transform;
+  }
+
+  .hero-name__line--role {
+    margin-top: 0.35em;
+    font-size: clamp(9px, 1.05vw, 12px);
+    font-weight: 800;
+    line-height: 1.4;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-clay);
   }
 
   .hero-rule {
@@ -508,7 +641,8 @@
     display: flex;
     flex-direction: column;
     height: 100svh;
-    padding: clamp(72px, 9vw, 104px) 0 clamp(40px, 5vw, 60px);
+    /* Bottom padding clears the floating dock. */
+    padding: clamp(72px, 9vw, 104px) 0 clamp(92px, 11vh, 112px);
     background: var(--color-ink);
     color: var(--color-cream);
   }
@@ -983,6 +1117,48 @@
     object-fit: cover;
   }
 
+  /* Type-only slide for projects without a screenshot yet. */
+  .work-preview__slide--type {
+    container-type: size;
+    background-color: var(--color-maroon);
+    background-image: radial-gradient(rgb(255 237 164 / 0.1) 1px, transparent 1.5px);
+    background-size: 7px 7px;
+    color: var(--color-cream);
+  }
+
+  .work-preview__no {
+    position: absolute;
+    top: 14px;
+    left: 16px;
+    rotate: -8deg;
+    font-family: var(--font-marker);
+    font-size: 22px;
+    line-height: 1;
+  }
+
+  .work-preview__word {
+    position: absolute;
+    left: 16px;
+    bottom: 64px;
+    font-family: var(--font-display);
+    font-size: 22cqw;
+    line-height: 1;
+    text-box: trim-both cap alphabetic;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .work-preview__badge {
+    position: absolute;
+    left: 12px;
+    bottom: 12px;
+    padding: 0.7em 1.1em;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
   @media (hover: hover) and (pointer: fine) {
     .work-grid {
       display: none;
@@ -1027,6 +1203,200 @@
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--color-clay);
+  }
+}
+
+/* //// LIQUID GLASS //// */
+@layer components {
+  /* Reusable surface. Three layers, cheapest first:
+       1. tint + backdrop blur      (every browser with backdrop-filter)
+       2. specular border + sheen   (pure gradients, no extra paint cost)
+       3. SVG displacement          (Chromium only, opted in via html.refract)
+     The tint stays at ~60% so text keeps its contrast on any section. */
+  .glass {
+    --glass-tint: 255 250 228;
+    --glass-ink: var(--color-maroon);
+    --glass-edge: 255 255 255;
+    --glass-alpha: 0.6;
+    --glass-radius: 0px;
+    --gx: 50%;
+    --gy: -60%;
+
+    isolation: isolate;
+    border-radius: var(--glass-radius);
+    color: var(--glass-ink);
+    background-color: rgb(var(--glass-tint) / var(--glass-alpha));
+    -webkit-backdrop-filter: blur(14px) saturate(170%);
+    backdrop-filter: blur(14px) saturate(170%);
+    box-shadow:
+      inset 0 1px 0 rgb(var(--glass-edge) / 0.55),
+      inset 0 -1px 0 rgb(var(--glass-edge) / 0.12),
+      0 18px 40px -16px rgb(40 9 11 / 0.5),
+      0 2px 6px rgb(40 9 11 / 0.14);
+    transition:
+      background-color 0.5s var(--ease-out-expo),
+      color 0.5s var(--ease-out-expo);
+  }
+
+  .glass[data-tone="dark"] {
+    --glass-tint: 70 17 19;
+    --glass-ink: var(--color-cream);
+    --glass-edge: 255 237 164;
+  }
+
+  /* Refraction: bend the backdrop first, then soften it. */
+  html.refract .glass {
+    -webkit-backdrop-filter: url("#liquid-glass") blur(9px) saturate(170%);
+    backdrop-filter: url("#liquid-glass") blur(9px) saturate(170%);
+  }
+
+  /* Specular rim: a 1px gradient ring, bright where light would catch. */
+  .glass::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    padding: 1px;
+    border-radius: inherit;
+    background: linear-gradient(
+      118deg,
+      rgb(var(--glass-edge) / 0.9),
+      rgb(var(--glass-edge) / 0.1) 30%,
+      rgb(var(--glass-edge) / 0.04) 64%,
+      rgb(var(--glass-edge) / 0.6)
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  /* Sheen: a soft highlight that follows the pointer (--gx / --gy). */
+  .glass::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: radial-gradient(
+      130px circle at var(--gx) var(--gy),
+      rgb(var(--glass-edge) / 0.42),
+      transparent 70%
+    );
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    .glass,
+    html.refract .glass {
+      --glass-alpha: 0.96;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+  }
+
+  /* //// DOCK //// */
+  .dock {
+    position: fixed;
+    left: 50%;
+    bottom: max(18px, env(safe-area-inset-bottom));
+    z-index: 70;
+    display: flex;
+    align-items: center;
+    gap: clamp(2px, 0.6vw, 8px);
+    max-width: calc(100vw - 24px);
+    padding: 6px;
+    translate: -50% 0;
+    transition:
+      translate 0.8s var(--ease-out-expo),
+      opacity 0.5s var(--ease-out-expo),
+      visibility 0.5s,
+      background-color 0.5s var(--ease-out-expo),
+      color 0.5s var(--ease-out-expo);
+  }
+
+  /* Parked below the fold until the intro reveals it, and again at the contact section. */
+  html.js .dock:not(.is-ready),
+  .dock.is-away {
+    translate: -50% 170%;
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .dock__home {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    flex: none;
+  }
+
+  .dock__home .logo-mark {
+    height: 28px;
+    transition: scale 0.5s var(--ease-out-expo);
+  }
+
+  .dock__list {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+  }
+
+  .dock__link {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    height: 40px;
+    padding-inline: clamp(10px, 1.5vw, 18px);
+    font-size: clamp(10px, 1.02vw, 12px);
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: color 0.4s var(--ease-out-expo);
+  }
+
+  .dock__link.is-active {
+    color: rgb(var(--glass-tint));
+  }
+
+  /* Sliding marker behind the active link; JS feeds --x and --w. */
+  .dock__pill {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: var(--w, 0px);
+    background: currentColor;
+    opacity: 0;
+    transform: translateX(var(--x, 0px));
+    transition:
+      transform 0.6s var(--ease-out-expo),
+      width 0.6s var(--ease-out-expo),
+      opacity 0.35s linear;
+    pointer-events: none;
+  }
+
+  .dock__pill.is-on {
+    opacity: 1;
+  }
+
+  @media (hover: hover) {
+    .dock__home:hover .logo-mark {
+      scale: 1.12;
+    }
+
+    .dock__link:not(.is-active):hover {
+      opacity: 0.62;
+    }
+  }
+
+  .dock :focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
   }
 }
 
