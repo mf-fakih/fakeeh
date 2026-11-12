@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* //// SETUP //// */
+/* //////////// SETUP //////////// */
 @source "../index.html";
 @source "./js";
 
@@ -31,7 +31,7 @@
   --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* //// BASE //// */
+/* //////////// BASE //////////// */
 @layer base {
   *,
   *::before,
@@ -60,7 +60,7 @@
     overflow: hidden;
   }
 
-  /* Avoid overflow-x here; it breaks sticky positioning on the hero/contact. */
+  /* No overflow-x on body: it breaks the sticky hero/contact. */
   body {
     @apply bg-ink font-body text-maroon antialiased;
   }
@@ -93,36 +93,14 @@
   }
 }
 
-/* //// SHARED COMPONENTS //// */
+/* //////////// SHARED COMPONENTS //////////// */
 @layer components {
-
   .logo-mark {
     display: block;
     aspect-ratio: 900 / 1235;
     background: currentColor;
-    -webkit-mask: url("../src/assets/logo-signature.png") center / contain no-repeat;
-    mask: url("../src/assets/logo-signature.png") center / contain no-repeat;
-  }
-
-  .sign-ink {
-    --ink: 110%;
-    display: block;
-    aspect-ratio: 900 / 1235;
-    background: currentColor;
-    -webkit-mask-image:
-      url("../src/assets/logo-signature.png"),
-      linear-gradient(100deg, #000 var(--ink), transparent calc(var(--ink) + 14%));
-    mask-image:
-      url("../src/assets/logo-signature.png"),
-      linear-gradient(100deg, #000 var(--ink), transparent calc(var(--ink) + 14%));
-    -webkit-mask-size: contain, 100% 100%;
-    mask-size: contain, 100% 100%;
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    -webkit-mask-position: center;
-    mask-position: center;
-    -webkit-mask-composite: source-in;
-    mask-composite: intersect;
+    -webkit-mask: url("../src/assets/logo-signature.webp") center / contain no-repeat;
+    mask: url("../src/assets/logo-signature.webp") center / contain no-repeat;
   }
 
   .eyebrow {
@@ -159,7 +137,7 @@
   }
 }
 
-/* //// ANIMATED TEXT //// */
+/* //////////// ANIMATED TEXT //////////// */
 @layer components {
   .sp-w {
     display: inline-block;
@@ -171,7 +149,6 @@
 
   .sp-i {
     display: inline-block;
-    will-change: transform;
   }
 
   .fade-words .sp-w {
@@ -180,21 +157,20 @@
 
   .fade-words .sp-i {
     opacity: 0.16;
-    transition: opacity 0.35s linear;
   }
 }
 
-/* //// PRELOADER — split-curtain typography //// */
+/* //////////// PRELOADER //////////// */
 @layer components {
-  /* Two ink curtains meet on a seam. The giant counter is rendered once in
-     each half and clipped by it, so the number itself tears apart on exit. */
   .loader {
+    --loader-x: clamp(18px, 3.4vw, 46px);
+    --loader-y: clamp(16px, 2.4vw, 34px);
     position: fixed;
     inset: 0;
     z-index: 90;
     background: var(--color-ink);
     color: var(--color-cream);
-    /* Failsafe: if the script never runs, the curtain still lifts. */
+    /* Failsafe: lifts the curtain if the script never runs. */
     animation: loader-failsafe 0.5s linear 8s forwards;
   }
 
@@ -205,34 +181,42 @@
     }
   }
 
-  .loader__half {
+  .loader__half,
+  .loader__under {
     position: absolute;
     left: 0;
     right: 0;
     height: 50%;
-    overflow: clip;
-    background: var(--color-ink);
     will-change: transform;
   }
 
-  .loader__half--top {
+  .loader__half {
+    overflow: clip;
+    background: var(--color-ink);
+  }
+
+  .loader__under {
+    background: var(--color-maroon);
+  }
+
+  .loader__half--top,
+  .loader__under--top {
     top: 0;
   }
 
-  .loader__half--bottom {
+  .loader__half--bottom,
+  .loader__under--bottom {
     bottom: 0;
   }
 
-  /* Each face spans the full loader, so both copies of the number sit on
-     exactly the same pixels and line up across the seam. */
+  /* Each face covers the whole viewport inside its clipped half, so the two
+     copies land on identical pixels and the signature tears along the seam. */
   .loader__face {
     position: absolute;
     left: 0;
     width: 100%;
     height: 200%;
-    display: flex;
-    align-items: center;
-    padding-inline: clamp(18px, 3.4vw, 46px);
+    will-change: transform;
   }
 
   .loader__half--top .loader__face {
@@ -243,18 +227,43 @@
     bottom: 0;
   }
 
+  /* Dead centre: the seam runs through the signature's middle. */
+  .loader__stage {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    translate: -50% -50%;
+  }
+
+  .loader__sign {
+    display: block;
+    height: clamp(118px, 34vh, 300px);
+    width: auto;
+    aspect-ratio: 900 / 1235;
+    color: var(--color-cream);
+    overflow: visible;
+    opacity: 0;
+    transition: opacity 0.5s linear;
+  }
+
+  .loader.is-live .loader__sign {
+    opacity: 1;
+  }
+
+  /* Archivo Black: Gondens DEMO has no numerals. */
   .loader__num {
+    position: absolute;
+    right: var(--loader-x);
+    bottom: calc(var(--loader-y) - 0.14em);
     display: flex;
     align-items: flex-start;
-    /* Archivo Black, not the display face: Gondens DEMO ships without numerals. */
     font-family: "Archivo Black", var(--font-body);
-    font-size: min(44vw, 70vh);
-    line-height: 0.8;
-    letter-spacing: -0.02em;
+    font-size: clamp(30px, 5vw, 72px);
+    line-height: 0.82;
+    letter-spacing: -0.03em;
     white-space: nowrap;
-    /* Stays hidden until its font is in, so the digits never swap typeface. */
     opacity: 0;
-    transition: opacity 0.4s linear;
+    transition: opacity 0.6s var(--ease-out-quint);
   }
 
   .loader.is-live .loader__num {
@@ -263,44 +272,52 @@
 
   .loader__num sup {
     top: 0;
-    margin-left: 0.06em;
+    margin-left: 0.05em;
     font-family: var(--font-body);
-    font-size: 0.13em;
+    font-size: 0.12em;
     font-weight: 800;
     line-height: 1.5;
     letter-spacing: 0;
+    color: rgb(255 237 164 / 0.62);
   }
 
   .loader__note {
     position: absolute;
+    display: block;
+    overflow: clip;
+    padding-block: 0.15em;
     font-size: clamp(9px, 1.05vw, 12px);
     font-weight: 800;
+    line-height: 1.2;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     color: rgb(255 237 164 / 0.62);
   }
 
+  .loader__note > span {
+    display: block;
+  }
+
   .loader__note--tl,
   .loader__note--tr {
-    top: clamp(16px, 2.4vw, 34px);
+    top: var(--loader-y);
   }
 
-  .loader__note--bl,
-  .loader__note--br {
-    bottom: clamp(16px, 2.4vw, 34px);
+  .loader__note--bl {
+    bottom: var(--loader-y);
   }
 
   .loader__note--tl,
   .loader__note--bl {
-    left: clamp(18px, 3.4vw, 46px);
+    left: var(--loader-x);
   }
 
-  .loader__note--tr,
-  .loader__note--br {
-    right: clamp(18px, 3.4vw, 46px);
+  .loader__note--tr {
+    right: var(--loader-x);
   }
 
   .loader__note--bl {
+    padding: 0.2em 0.1em;
     rotate: -3deg;
     font-family: var(--font-marker);
     font-size: clamp(14px, 1.5vw, 22px);
@@ -309,7 +326,7 @@
     text-transform: none;
   }
 
-  /* The seam doubles as the progress bar. */
+  /* The ruled line the signature sits on, doubling as the progress bar. */
   .loader__seam {
     position: absolute;
     left: 0;
@@ -317,7 +334,7 @@
     top: 50%;
     height: 2px;
     margin-top: -1px;
-    background: rgb(255 237 164 / 0.55);
+    background: rgb(255 237 164 / 0.4);
     transform: scaleX(0);
     transform-origin: 0 50%;
   }
@@ -327,7 +344,7 @@
   }
 }
 
-/* //// HERO //// */
+/* //////////// HERO //////////// */
 @layer components {
   .hero-card {
     container-type: size;
@@ -371,7 +388,6 @@
 
   .hero-name__line > span {
     display: block;
-    will-change: transform;
   }
 
   .hero-name__line--role {
@@ -382,13 +398,6 @@
     letter-spacing: 0.2em;
     text-transform: uppercase;
     color: var(--color-clay);
-  }
-
-  .hero-rule {
-    height: 1.5px;
-    background: rgb(117 28 32 / 0.3);
-    transform: scaleX(0);
-    transform-origin: 0 50%;
   }
 
   .hero-meta {
@@ -430,7 +439,7 @@
   }
 }
 
-/* //// MARQUEE //// */
+/* //////////// MARQUEE //////////// */
 @layer components {
   .marquee {
     display: flex;
@@ -451,13 +460,6 @@
     gap: clamp(22px, 3.4vw, 56px);
     padding-right: clamp(22px, 3.4vw, 56px);
     white-space: nowrap;
-  }
-
-  .marquee--band .marquee__item {
-    font-size: clamp(12px, 1.5vw, 19px);
-    font-weight: 800;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
   }
 
   .cross-marquee {
@@ -515,9 +517,8 @@
   }
 }
 
-/* //// ABOUT //// */
+/* //////////// ABOUT //////////// */
 @layer components {
-
   .media-mask {
     position: relative;
     overflow: clip;
@@ -532,11 +533,6 @@
     height: 128%;
     object-fit: cover;
     will-change: transform;
-  }
-
-  .media-mask--soft img {
-    inset: -6% 0;
-    height: 112%;
   }
 
   .stats {
@@ -634,14 +630,13 @@
   }
 }
 
-/* //// ACHIEVEMENTS //// */
+/* //////////// ACHIEVEMENTS //////////// */
 @layer components {
   .cert-stage {
     position: relative;
     display: flex;
     flex-direction: column;
     height: 100svh;
-    /* Bottom padding clears the floating dock. */
     padding: clamp(72px, 9vw, 104px) 0 clamp(92px, 11vh, 112px);
     background: var(--color-ink);
     color: var(--color-cream);
@@ -677,12 +672,6 @@
     will-change: transform;
   }
 
-  .cert-panel {
-    flex: none;
-    width: clamp(240px, 26vw, 360px);
-    align-self: center;
-  }
-
   .cert-card {
     position: relative;
     flex: none;
@@ -694,7 +683,6 @@
     border-radius: 0;
     background: var(--color-cream);
     color: var(--color-maroon);
-    will-change: transform;
   }
 
   .cert-card__open {
@@ -841,7 +829,7 @@
     transform-origin: 0 50%;
   }
 
-  /* //// CERTIFICATE LIGHTBOX //// */
+  /* //////////// CERTIFICATE LIGHTBOX //////////// */
   .lightbox {
     width: 100vw;
     height: 100svh;
@@ -991,13 +979,12 @@
     scroll-snap-type: x mandatory;
   }
 
-  .cert-fallback .cert-card,
-  .cert-fallback .cert-panel {
+  .cert-fallback .cert-card {
     scroll-snap-align: center;
   }
 }
 
-/* //// WORKS //// */
+/* //////////// WORKS //////////// */
 @layer components {
   .work-row {
     position: relative;
@@ -1117,7 +1104,6 @@
     object-fit: cover;
   }
 
-  /* Type-only slide for projects without a screenshot yet. */
   .work-preview__slide--type {
     container-type: size;
     background-color: var(--color-maroon);
@@ -1159,60 +1145,11 @@
     text-transform: uppercase;
   }
 
-  @media (hover: hover) and (pointer: fine) {
-    .work-grid {
-      display: none;
-    }
-  }
-
-  .work-tile {
-    display: block;
-  }
-
-  .work-tile .media-mask img {
-    transition: scale 0.8s var(--ease-out-expo);
-  }
-
-  @media (hover: hover) {
-    .work-tile:hover .media-mask img {
-      scale: 1.06;
-    }
-  }
-
-  .work-cap {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 0.3em 1rem;
-    margin-top: clamp(10px, 1.4vw, 18px);
-  }
-
-  .work-cap__name {
-    font-size: clamp(20px, 2.4vw, 32px);
-    font-weight: 800;
-    line-height: 1;
-    letter-spacing: -0.05em;
-    text-transform: lowercase;
-    color: var(--color-maroon);
-  }
-
-  .work-cap__meta {
-    font-size: clamp(9px, 1vw, 11px);
-    font-weight: 800;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--color-clay);
-  }
 }
 
-/* //// LIQUID GLASS //// */
+/* //////////// LIQUID GLASS //////////// */
 @layer components {
-  /* Reusable surface. Three layers, cheapest first:
-       1. tint + backdrop blur      (every browser with backdrop-filter)
-       2. specular border + sheen   (pure gradients, no extra paint cost)
-       3. SVG displacement          (Chromium only, opted in via html.refract)
-     The tint stays at ~60% so text keeps its contrast on any section. */
+  /* Layers: tint + blur, rim + sheen, SVG refraction (html.refract). */
   .glass {
     --glass-tint: 255 250 228;
     --glass-ink: var(--color-maroon);
@@ -1244,13 +1181,12 @@
     --glass-edge: 255 237 164;
   }
 
-  /* Refraction: bend the backdrop first, then soften it. */
   html.refract .glass {
     -webkit-backdrop-filter: url("#liquid-glass") blur(9px) saturate(170%);
     backdrop-filter: url("#liquid-glass") blur(9px) saturate(170%);
   }
 
-  /* Specular rim: a 1px gradient ring, bright where light would catch. */
+  /* //// specular rim //// */
   .glass::before {
     content: "";
     position: absolute;
@@ -1273,7 +1209,7 @@
     pointer-events: none;
   }
 
-  /* Sheen: a soft highlight that follows the pointer (--gx / --gy). */
+  /* //// pointer sheen //// */
   .glass::after {
     content: "";
     position: absolute;
@@ -1297,7 +1233,7 @@
     }
   }
 
-  /* //// DOCK //// */
+  /* //////////// DOCK //////////// */
   .dock {
     position: fixed;
     left: 50%;
@@ -1317,7 +1253,7 @@
       color 0.5s var(--ease-out-expo);
   }
 
-  /* Parked below the fold until the intro reveals it, and again at the contact section. */
+  /* Hidden until the intro, and again at contact. */
   html.js .dock:not(.is-ready),
   .dock.is-away {
     translate: -50% 170%;
@@ -1363,7 +1299,7 @@
     color: rgb(var(--glass-tint));
   }
 
-  /* Sliding marker behind the active link; JS feeds --x and --w. */
+  /* Active marker; JS feeds --x / --w. */
   .dock__pill {
     position: absolute;
     top: 0;
@@ -1400,9 +1336,8 @@
   }
 }
 
-/* //// CONTACT //// */
+/* //////////// CONTACT //////////// */
 @layer components {
-
   .contact-main {
     display: grid;
     align-items: center;
@@ -1441,48 +1376,6 @@
     transition: translate 0.45s var(--ease-out-expo);
   }
 
-  .say-hello {
-    position: relative;
-    display: grid;
-    place-items: center;
-    width: clamp(128px, 16vw, 200px);
-    aspect-ratio: 1;
-    border-radius: 0;
-    background: var(--color-cream);
-    color: var(--color-ink);
-    overflow: clip;
-    font-size: clamp(12px, 1.4vw, 16px);
-    font-weight: 900;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    text-align: center;
-  }
-
-  .say-hello::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: var(--color-maroon);
-    border-radius: 0;
-    transform: scale(0);
-    transition: transform 0.6s var(--ease-out-expo);
-  }
-
-  .say-hello span {
-    position: relative;
-    transition: color 0.45s var(--ease-out-expo);
-  }
-
-  @media (hover: hover) {
-    .say-hello:hover::before {
-      transform: scale(1.06);
-    }
-
-    .say-hello:hover span {
-      color: var(--color-cream);
-    }
-  }
-
   .swap {
     position: relative;
     display: inline-block;
@@ -1512,32 +1405,9 @@
     }
   }
 
-  .link-line {
-    position: relative;
-    display: inline-block;
-  }
-
-  .link-line::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: -0.12em;
-    width: 100%;
-    height: 1.5px;
-    background: currentColor;
-    transform: scaleX(0);
-    transform-origin: 0 50%;
-    transition: transform 0.5s var(--ease-out-expo);
-  }
-
-  @media (hover: hover) {
-    .link-line:hover::after {
-      transform: scaleX(1);
-    }
-  }
 }
 
-/* //// FOOTER //// */
+/* //////////// FOOTER //////////// */
 @layer components {
   .site-footer {
     position: relative;
@@ -1670,7 +1540,7 @@
   }
 }
 
-/* //// REDUCED MOTION //// */
+/* //////////// REDUCED MOTION //////////// */
 @media (prefers-reduced-motion: reduce) {
   .asterisk--spin,
   .scroll-cue__arrow {
@@ -1688,7 +1558,7 @@
   }
 }
 
-/* //// DECORATIVE ELEMENTS //// */
+/* //////////// DECORATIVE ELEMENTS //////////// */
 @layer components {
   :root {
     --font-marker: "Permanent Marker", "Comic Sans MS", cursive;
@@ -1696,7 +1566,7 @@
 
   .grain {
     position: fixed;
-    inset: -50%;
+    inset: -10%;
     z-index: 95;
     pointer-events: none;
     opacity: 0.08;

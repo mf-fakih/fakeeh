@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <!-- //// SEO //// -->
+    <!-- //////////// SEO //////////// -->
     <title>Muhammad Fakhril Fakih — Full-Stack Web Engineer in Bandung</title>
     <meta
       name="description"
@@ -14,7 +14,7 @@
     <link rel="canonical" href="https://fakeeh.vercel.app/" />
     <meta name="theme-color" content="#461113" />
 
-    <!-- Open Graph -->
+    <!-- //////////// OPEN GRAPH //////////// -->
     <meta property="og:type" content="profile" />
     <meta property="og:site_name" content="Fakeeh — Muhammad Fakhril Fakih" />
     <meta property="og:title" content="Muhammad Fakhril Fakih — Full-Stack Web Engineer" />
@@ -33,7 +33,7 @@
     <meta property="profile:last_name" content="Fakih" />
     <meta property="profile:username" content="mf-fakih" />
 
-    <!-- Twitter / X -->
+    <!-- //////////// TWITTER / X //////////// -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Muhammad Fakhril Fakih — Full-Stack Web Engineer" />
     <meta
@@ -43,7 +43,7 @@
     <meta name="twitter:image" content="https://fakeeh.vercel.app/src/assets/og-image.png" />
     <meta name="twitter:image:alt" content="Muhammad Fakhril Fakih — Full-Stack Web Engineer, portfolio cover" />
 
-    <!-- Structured data -->
+    <!-- //////////// STRUCTURED DATA //////////// -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -117,30 +117,33 @@
       }
     </script>
 
-    <!-- //// ASSETS //// -->
+    <!-- //////////// ASSETS //////////// -->
     <link rel="icon" type="image/png" href="./src/assets/favicon.png" />
     <link rel="apple-touch-icon" href="./src/assets/favicon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preload" href="./src/fonts/GondensDEMO.otf" as="font" type="font/otf" crossorigin />
-    <link rel="preload" href="./src/assets/hero-portrait.png" as="image" fetchpriority="high" />
+    <link rel="preload" href="./src/assets/logo-signature.webp" as="image" type="image/webp" fetchpriority="high" />
+    <link rel="preload" href="./src/assets/hero-portrait.webp" as="image" type="image/webp" fetchpriority="high" />
     <link
-      href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Permanent+Marker&family=Poppins:wght@400;600;700;800;900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Permanent+Marker&family=Poppins:wght@400;700;800;900&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./dist/output.css" />
     <script>
-      // Runs before first paint: flags JS (so the preloader + hidden states apply
-      // without a flash) and opts Chromium into the SVG refraction filter.
+      // //////////// JS FLAG + GLASS REFRACTION ////////////
+      // Refraction is costly per frame: Chromium on capable desktops only.
       (function (d) {
         d.classList.add("js");
         var chromium = !!window.chrome || /Chrom(e|ium)\//.test(navigator.userAgent);
-        if (chromium && window.CSS && CSS.supports("backdrop-filter", "blur(1px)")) d.classList.add("refract");
+        var strong = (navigator.hardwareConcurrency || 4) >= 6 && (navigator.deviceMemory || 8) >= 4;
+        var desktop = matchMedia("(hover: hover) and (pointer: fine)").matches;
+        if (chromium && strong && desktop && window.CSS && CSS.supports("backdrop-filter", "blur(1px)")) d.classList.add("refract");
       })(document.documentElement);
     </script>
   </head>
   <body>
-    <!-- //// ICON SPRITE //// -->
+    <!-- //////////// ICON SPRITE //////////// -->
     <svg width="0" height="0" aria-hidden="true" style="position: absolute">
       <defs>
         <g id="i-asterisk">
@@ -151,7 +154,7 @@
           <path d="M -15 0 L 15 0 L 27 -98 L -27 -98 Z" transform="rotate(288)" />
           <circle r="22" />
         </g>
-        <!-- Liquid glass: low-frequency noise bends whatever sits behind the element. -->
+        <!-- //////////// LIQUID GLASS FILTER //////////// -->
         <filter id="liquid-glass" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
           <feTurbulence type="fractalNoise" baseFrequency="0.012 0.02" numOctaves="1" seed="7" result="noise" />
           <feGaussianBlur in="noise" stdDeviation="2" result="soft" />
@@ -159,25 +162,28 @@
         </filter>
       </defs>
     </svg>
-    <!-- //// PRELOADER (split-curtain typography) //// -->
+    <!-- //////////// PRELOADER //////////// -->
     <div class="loader" data-loader aria-hidden="true">
+      <div class="loader__under loader__under--top" data-loader-under="top"></div>
+      <div class="loader__under loader__under--bottom" data-loader-under="bottom"></div>
       <div class="loader__half loader__half--top" data-loader-half="top">
-        <div class="loader__face">
+        <div class="loader__face" data-loader-face>
+          <div class="loader__stage" data-loader-mark></div>
           <p class="loader__num"><span data-loader-count>0</span><sup>%</sup></p>
         </div>
-        <span class="loader__note loader__note--tl">muhammad fakhril fakih</span>
-        <span class="loader__note loader__note--tr">portfolio — 2026</span>
+        <span class="loader__note loader__note--tl"><span data-loader-note>muhammad fakhril fakih</span></span>
+        <span class="loader__note loader__note--tr"><span data-loader-note>portfolio — 2026</span></span>
       </div>
       <div class="loader__half loader__half--bottom" data-loader-half="bottom">
-        <div class="loader__face">
+        <div class="loader__face" data-loader-face>
+          <div class="loader__stage" data-loader-mark></div>
           <p class="loader__num"><span data-loader-count>0</span><sup>%</sup></p>
         </div>
-        <span class="loader__note loader__note--bl">hand-made. loading by hand.</span>
-        <span class="loader__note loader__note--br">bandung, id</span>
+        <span class="loader__note loader__note--bl"><span data-loader-note>hand-made. loading by hand.</span></span>
       </div>
       <i class="loader__seam" data-loader-seam></i>
     </div>
-    <!-- //// DOCK (liquid glass) //// -->
+    <!-- //////////// DOCK //////////// -->
     <nav class="dock glass" data-dock aria-label="Primary">
       <a class="dock__home" href="#hero" data-nav-link aria-label="Muhammad Fakhril Fakih — back to top">
         <span class="logo-mark" aria-hidden="true"></span>
@@ -190,7 +196,7 @@
         <li class="dock__pill" data-dock-pill aria-hidden="true"></li>
       </ul>
     </nav>
-    <!-- //// HERO //// -->
+    <!-- //////////// HERO //////////// -->
     <div
       id="hero"
       data-theme="light"
@@ -200,7 +206,6 @@
         data-hero-card
         aria-label="Intro">
         <span class="tag tag--hero" style="--r: -5deg" aria-hidden="true">est. 2023 — bdg</span>
-        <!-- The one <h1>: name + role. The giant word below is decoration. -->
         <h1 class="hero-name" data-hero-name>
           <span class="hero-name__line"><span>Muhammad Fakhril Fakih</span></span>
           <span class="hero-name__line hero-name__line--role"><span>Full-Stack Web Engineer — Bandung, ID</span></span>
@@ -215,7 +220,7 @@
         <div class="absolute inset-0 z-10" data-hero-portrait>
           <div class="absolute inset-0" data-hero-tilt>
             <img
-              src="./src/assets/hero-portrait.png"
+              src="./src/assets/hero-portrait.webp"
               alt="Muhammad Fakhril Fakih in profile, wearing a black t-shirt and a navy backpack"
               width="561"
               height="558"
@@ -239,7 +244,7 @@
       </section>
     </div>
     <main class="relative z-10 -mt-[150px]">
-      <!-- //// CROSS MARQUEE //// -->
+      <!-- //////////// CROSS MARQUEE //////////// -->
       <div class="cross-marquee" aria-hidden="true">
         <div class="marquee cross-marquee__a" data-marquee data-speed="0.6" data-theme="dark">
           <div class="marquee__track" data-marquee-track>
@@ -264,7 +269,7 @@
           </div>
         </div>
       </div>
-      <!-- //// ABOUT //// -->
+      <!-- //////////// ABOUT //////////// -->
       <section
         id="about"
         data-theme="light"
@@ -288,10 +293,10 @@
             <div class="lg:sticky lg:top-[13vh] lg:self-start">
               <div class="media-mask aspect-[4/5] w-full" data-parallax-mask>
                 <img
-                  src="./src/assets/about-portrait.png"
+                  src="./src/assets/about-portrait.webp"
                   alt="Portrait of Muhammad Fakhril Fakih, full-stack web engineer and UI designer from Bandung"
-                  width="1254"
-                  height="1254"
+                  width="1000"
+                  height="1000"
                   loading="lazy"
                   decoding="async"
                   data-parallax-img
@@ -347,7 +352,7 @@
           </div>
         </div>
       </section>
-      <!-- //// ACHIEVEMENTS //// -->
+      <!-- //////////// ACHIEVEMENTS //////////// -->
       <section id="achievements" data-theme="dark" data-cert aria-labelledby="achievements-title">
         <div class="cert-stage" data-cert-stage>
           <div class="cert-head">
@@ -366,7 +371,7 @@
               <article
                 class="cert-card"
                 data-cert-card
-                data-full="./src/assets/sertifikat/html.jpg"
+                data-full="./src/assets/sertifikat/html.webp"
                 data-title="Introduction to HTML"
                 data-meta="Sololearn · 27 July 2026 · CC-JNFASKDJ"
                 data-alt="Sololearn Introduction to HTML certificate awarded to Muhammad Fakhril Fakih">
@@ -387,7 +392,7 @@
               <article
                 class="cert-card"
                 data-cert-card
-                data-full="./src/assets/sertifikat/css.jpg"
+                data-full="./src/assets/sertifikat/css.webp"
                 data-title="Introduction to CSS"
                 data-meta="Sololearn · 31 July 2026 · CC-ZRBN6QPO"
                 data-alt="Sololearn Introduction to CSS certificate awarded to Muhammad Fakhril Fakih">
@@ -408,7 +413,7 @@
               <article
                 class="cert-card"
                 data-cert-card
-                data-full="./src/assets/sertifikat/web-development.jpg"
+                data-full="./src/assets/sertifikat/web-development.webp"
                 data-title="Web Development"
                 data-meta="Sololearn · 5 August 2026 · CC-WVH5PNSJ"
                 data-alt="Sololearn Web Development certificate awarded to Muhammad Fakhril Fakih">
@@ -429,7 +434,7 @@
               <article
                 class="cert-card"
                 data-cert-card
-                data-full="./src/assets/sertifikat/javascript.png"
+                data-full="./src/assets/sertifikat/javascript.webp"
                 data-title="Introduction to JavaScript"
                 data-meta="Sololearn · 6 November 2026 · CC-4NZZNCSJ"
                 data-alt="Sololearn Introduction to JavaScript certificate awarded to Muhammad Fakhril Fakih">
@@ -450,7 +455,7 @@
               <article
                 class="cert-card"
                 data-cert-card
-                data-full="./src/assets/sertifikat/prompt-engineering.jpg"
+                data-full="./src/assets/sertifikat/prompt-engineering.webp"
                 data-title="Prompt Engineering"
                 data-meta="Sololearn · 6 November 2026 · CC-L3SV56XG"
                 data-alt="Sololearn Prompt Engineering certificate awarded to Muhammad Fakhril Fakih">
@@ -471,7 +476,7 @@
               <article
                 class="cert-card"
                 data-cert-card
-                data-full="./src/assets/sertifikat/vibe-coding.jpg"
+                data-full="./src/assets/sertifikat/vibe-coding.webp"
                 data-title="Vibe Coding"
                 data-meta="Sololearn · 10 November 2026 · CC-I7PUXOHE"
                 data-alt="Sololearn Vibe Coding certificate awarded to Muhammad Fakhril Fakih">
@@ -492,7 +497,7 @@
               <article
                 class="cert-card"
                 data-cert-card
-                data-full="./src/assets/sertifikat/generative-ai.jpg"
+                data-full="./src/assets/sertifikat/generative-ai.webp"
                 data-title="Generative AI in Practice"
                 data-meta="Sololearn · 10 November 2026 · CC-ETB3Q1JE"
                 data-alt="Sololearn Generative AI in Practice certificate awarded to Muhammad Fakhril Fakih">
@@ -518,7 +523,7 @@
           </div>
         </div>
       </section>
-      <!-- //// WORKS //// -->
+      <!-- //////////// WORKS //////////// -->
       <section
         id="works"
         data-theme="light"
@@ -572,7 +577,7 @@
           </ul>
         </div>
       </section>
-      <!-- //// CONTACT TRANSITION //// -->
+      <!-- //////////// CONTACT TRANSITION //////////// -->
       <div class="overflow-x-clip bg-paper px-[clamp(18px,3.4vw,46px)] pb-[clamp(60px,9vw,150px)] text-maroon" aria-hidden="true">
         <p class="talk-static" data-drift>
           <span>let's talk</span>
@@ -580,7 +585,7 @@
         </p>
       </div>
     </main>
-    <!-- //// CONTACT //// -->
+    <!-- //////////// CONTACT //////////// -->
     <section
       id="contact"
       data-theme="dark"
@@ -594,7 +599,7 @@
             <svg class="sign-draw" viewBox="0 0 900 1235" role="img" aria-label="Signature of Muhammad Fakhril Fakih" data-sign-draw>
               <defs>
                 <mask id="sign-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="900" height="1235" style="mask-type: alpha">
-                  <image href="./src/assets/logo-signature.png" width="900" height="1235" />
+                  <image href="./src/assets/logo-signature.webp" width="900" height="1235" />
                 </mask>
               </defs>
               <g mask="url(#sign-mask)" fill="none" stroke="currentColor" stroke-width="71" stroke-linecap="round" stroke-linejoin="round">
@@ -682,7 +687,7 @@
         <span class="tag tag--cream" style="--r: -4deg" aria-hidden="true" data-anim="pop" data-parallax="28">← psst. i actually reply.</span>
       </div>
     </section>
-    <!-- //// FOOTER //// -->
+    <!-- //////////// FOOTER //////////// -->
     <footer class="site-footer" data-theme="light">
       <div class="footer-main">
         <div>
@@ -722,16 +727,16 @@
         </a>
       </div>
     </footer>
-    <!-- //// WORK PREVIEW (cursor-following card) //// -->
+    <!-- //////////// WORK PREVIEW //////////// -->
     <div class="work-preview" data-work-preview aria-hidden="true">
       <div class="work-preview__slide" data-work-slide="0">
-        <img src="./src/assets/portofolio/arkamweb.jpeg" alt="Screenshot of the Arkam Web company profile site, 2025" width="1903" height="2538" loading="lazy" decoding="async" />
+        <img src="./src/assets/portofolio/arkamweb.webp" alt="Screenshot of the Arkam Web company profile site, 2025" width="640" height="854" loading="lazy" decoding="async" />
       </div>
       <div class="work-preview__slide" data-work-slide="1">
-        <img src="./src/assets/portofolio/gizify.png" alt="Screenshot of Gizify, a nutrition app, 2025" width="1080" height="1350" loading="lazy" decoding="async" />
+        <img src="./src/assets/portofolio/gizify.webp" alt="Screenshot of Gizify, a nutrition app, 2025" width="640" height="800" loading="lazy" decoding="async" />
       </div>
       <div class="work-preview__slide" data-work-slide="2">
-        <img src="./src/assets/portofolio/7summit.png" alt="Screenshot of the 7Summit landing page, 2024" width="1080" height="1350" loading="lazy" decoding="async" />
+        <img src="./src/assets/portofolio/7summit.webp" alt="Screenshot of the 7Summit landing page, 2024" width="640" height="800" loading="lazy" decoding="async" />
       </div>
       <div class="work-preview__slide work-preview__slide--type" data-work-slide="3">
         <span class="work-preview__no">#04</span>
@@ -739,7 +744,7 @@
       </div>
       <span class="work-preview__badge glass" data-tone="dark">visit ↗</span>
     </div>
-    <!-- //// CERTIFICATE LIGHTBOX //// -->
+    <!-- //////////// CERTIFICATE LIGHTBOX //////////// -->
     <dialog class="lightbox" data-lightbox aria-labelledby="lightbox-title">
       <div class="lightbox__top">
         <span class="lightbox__count tabular-nums" data-lightbox-count>01 / 07</span>
@@ -765,7 +770,7 @@
         </div>
       </div>
     </dialog>
-    <!-- //// GRAIN //// -->
+    <!-- //////////// GRAIN //////////// -->
     <div class="grain" aria-hidden="true"></div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>

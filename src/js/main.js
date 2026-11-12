@@ -1,25 +1,9 @@
-/*
- * Fakeeh portfolio — interactions.
- *
- * One classic script (works from file:// and needs no bundler), organised as
- * small init functions. `boot()` at the bottom is the only thing that runs
- * them, in an order that is safe on a hard refresh:
- *
- *   1. smooth scroll        Lenis driven by the GSAP ticker
- *   2. hero hidden states   set while the preloader still covers the page
- *   3. preloader            counts, waits for fonts + hero image, splits
- *   4. scroll effects       every ScrollTrigger, created once
- *   5. refresh              after fonts / resize, so positions stay correct
- *
- * Every block degrades on its own: no GSAP, no ScrollTrigger, no hover, or
- * prefers-reduced-motion each leave readable, final-state content behind.
- */
+// //////////// FAKEEH PORTFOLIO — INTERACTIONS ////////////
+// Boot order: smooth scroll → hero hidden states → preloader → scroll effects.
 (() => {
   "use strict";
 
-  /* ------------------------------------------------------------------ */
-  /* Environment + helpers                                               */
-  /* ------------------------------------------------------------------ */
+  // //////////// ENVIRONMENT + HELPERS ////////////
 
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
@@ -29,16 +13,17 @@
   const hasGsap = typeof window.gsap !== "undefined";
   const hasST = hasGsap && typeof window.ScrollTrigger !== "undefined";
 
-  /** Duration helper: collapses to an instant under reduced motion. */
   const dur = (seconds) => (reduce ? 0.01 : seconds);
   const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   const pad2 = (n) => String(n).padStart(2, "0");
 
-  if (hasST) gsap.registerPlugin(ScrollTrigger);
+  if (hasST) {
+    gsap.registerPlugin(ScrollTrigger);
+    // Mobile URL-bar show/hide no longer forces a full refresh.
+    ScrollTrigger.config({ ignoreMobileResize: true });
+  }
 
-  /* ------------------------------------------------------------------ */
-  /* 1. Smooth scroll — Lenis in sync with ScrollTrigger                 */
-  /* ------------------------------------------------------------------ */
+  // //////////// SMOOTH SCROLL ////////////
 
   let lenis = null;
 
@@ -53,8 +38,6 @@
     });
 
     if (hasGsap) {
-      // One clock for everything: GSAP's ticker drives Lenis, and every Lenis
-      // scroll frame tells ScrollTrigger to re-read the position.
       if (hasST) lenis.on("scroll", ScrollTrigger.update);
       gsap.ticker.add((time) => lenis.raf(time * 1000));
       gsap.ticker.lagSmoothing(0);
@@ -67,7 +50,6 @@
     }
   };
 
-  // Temporarily unstick elements to measure their document position.
   const docTop = (el) => {
     const sticky = getComputedStyle(el).position === "sticky";
     if (sticky) el.style.position = "static";
@@ -97,11 +79,8 @@
     });
   };
 
-  /* ------------------------------------------------------------------ */
-  /* Text splitting                                                      */
-  /* ------------------------------------------------------------------ */
+  // //////////// TEXT SPLITTING ////////////
 
-  // Each part becomes <span.sp-w (mask)><span.sp-i (moves)>text</span></span>.
   const wrapPart = (text) => {
     const outer = document.createElement("span");
     outer.className = "sp-w";
@@ -133,8 +112,7 @@
     });
   };
 
-  // Which visual line each word sits on, read at the moment of the reveal so
-  // it is correct for the current width (no re-splitting needed on resize).
+  // Line index per word, read at reveal time so it fits the current width.
   const lineIndexes = (parts) => {
     const tops = [];
     return parts.map((part) => {
@@ -145,9 +123,7 @@
     });
   };
 
-  /* ------------------------------------------------------------------ */
-  /* 2. Hero — hidden states, intro, scroll parallax, pointer tilt       */
-  /* ------------------------------------------------------------------ */
+  // //////////// HERO ////////////
 
   const hero = {
     title: $("[data-hero-title]"),
@@ -160,7 +136,7 @@
     pops: [],
   };
 
-  // Runs while the preloader covers the page, so nothing flashes.
+  // Runs under the preloader, so nothing flashes.
   const prepHero = () => {
     if (hero.title) {
       hero.chars = splitChars(hero.title);
@@ -170,7 +146,6 @@
 
     if (!hasGsap) return;
 
-    // Tailwind centers with `translate`; GSAP animates `transform`, so the two never fight.
     gsap.set(hero.chars, { yPercent: 105, rotate: 4, force3D: true });
     gsap.set(hero.nameLines, { yPercent: 110 });
     if (hero.img) gsap.set(hero.img, { yPercent: 5, opacity: 0 });
@@ -232,7 +207,6 @@
     if (!hasST || reduce || !hero.title) return;
     const spread = hero.chars.length > 1 ? (hero.chars.length - 1) / 2 : 0;
 
-    // Layers leave at different speeds as <main> slides over the sticky hero.
     gsap
       .timeline({
         scrollTrigger: {
@@ -268,13 +242,34 @@
     );
   };
 
-  /* ------------------------------------------------------------------ */
-  /* 3. Preloader — split-curtain typography                             */
-  /* ------------------------------------------------------------------ */
+  // //////////// PRELOADER ////////////
 
-  // Counts 0 → 100 (power4.inOut), then waits until fonts and the hero image
-  // are really there (capped) before the two halves part. `onReveal` starts
-  // the hero intro while the curtains are still moving.
+  // The contact signature, cloned into the loader. Mask ids must stay unique,
+  // or the two <mask> elements collide and neither renders.
+  const cloneSignature = (host, index) => {
+    const source = $("[data-sign-draw]");
+    if (!host || !source) return null;
+
+    const svg = source.cloneNode(true);
+    svg.removeAttribute("data-sign-draw");
+    svg.removeAttribute("role");
+    svg.removeAttribute("aria-label");
+    svg.setAttribute("aria-hidden", "true");
+    svg.setAttribute("class", "loader__sign");
+
+    const mask = $("mask", svg);
+    const masked = $("g[mask]", svg);
+    if (mask && masked) {
+      mask.id = `sign-mask-loader-${index}`;
+      masked.setAttribute("mask", `url(#sign-mask-loader-${index})`);
+    }
+
+    host.appendChild(svg);
+    return svg;
+  };
+
+  // The signature writes itself as the counter climbs, inks solid at 100%, then
+  // the screen splits top / bottom: curtains first, maroon layers trailing.
   const initPreloader = (onReveal) => {
     const loader = $("[data-loader]");
     if (!loader) return onReveal();
@@ -284,21 +279,52 @@
       return onReveal();
     }
 
-    loader.style.animation = "none"; // the script is alive: cancel the CSS failsafe
+    loader.style.animation = "none";
 
     const counts = $$("[data-loader-count]", loader);
-    const top = $('[data-loader-half="top"]', loader);
-    const bottom = $('[data-loader-half="bottom"]', loader);
+    const notes = $$("[data-loader-note]", loader);
+    const faces = $$("[data-loader-face]", loader);
+    const half = (side) => $(`[data-loader-half="${side}"]`, loader);
+    const under = (side) => $(`[data-loader-under="${side}"]`, loader);
     const seam = $("[data-loader-seam]", loader);
     const state = { value: 0 };
-    const span = dur(2.2);
+    const span = dur(2.4);
+    const curtain = { duration: dur(1.25), ease: "expo.inOut" };
 
+    // One copy per half, written in lockstep so the seam cuts a single mark.
+    const signs = $$("[data-loader-mark]", loader)
+      .map((host, i) => cloneSignature(host, i))
+      .filter(Boolean);
+    const strokeSets = signs.map((svg) => $$("path", svg));
+    const fills = signs.map((svg) => $("[data-sign-fill]", svg)).filter(Boolean);
+    const allStrokes = strokeSets.flat();
+
+    // Paused: the counter scrubs it, so the ink keeps pace with the number.
+    const draw = gsap.timeline({ paused: true });
+    if (allStrokes.length) {
+      const lead = strokeSets[0];
+      const total = lead.reduce((sum, p) => sum + (+p.dataset.len || 1), 0);
+      gsap.set(allStrokes, { strokeDasharray: "1 1", strokeDashoffset: 1, visibility: "hidden" });
+      gsap.set(fills, { opacity: 0 });
+      lead.forEach((p, i) => {
+        const pair = strokeSets.map((set) => set[i]).filter(Boolean);
+        draw
+          .set(pair, { visibility: "visible" })
+          .to(pair, { strokeDashoffset: 0, duration: Math.max(0.004, (+p.dataset.len || 1) / total), ease: "none" });
+      });
+    }
+
+    let shown = -1;
     const render = () => {
-      const value = String(Math.round(state.value));
+      const value = Math.round(state.value);
+      draw.progress(state.value / 100);
+      if (value === shown) return;
+      shown = value;
       counts.forEach((el) => (el.textContent = value));
     };
 
     if (lenis) lenis.stop();
+    gsap.set(notes, { yPercent: 110 });
 
     const exit = gsap
       .timeline({
@@ -308,13 +334,16 @@
           if (lenis) lenis.start();
         },
       })
-      // The backing colour hid any sub-pixel gap on the seam; drop it now.
-      .set(loader, { backgroundColor: "transparent" })
-      .set(seam, { transformOrigin: "100% 50%" })
-      .to(seam, { scaleX: 0, duration: dur(0.6), ease: "power4.inOut" }, 0)
-      .to(top, { yPercent: -100, duration: dur(1.3), ease: "power4.inOut" }, 0.12)
-      .to(bottom, { yPercent: 100, duration: dur(1.3), ease: "power4.inOut" }, 0.12)
-      .call(onReveal, null, reduce ? 0 : 0.6);
+      .to(notes, { yPercent: -110, duration: dur(0.5), ease: "power3.in", stagger: 0.03 }, 0)
+      .to(seam, { scaleX: 0, transformOrigin: "100% 50%", duration: dur(0.6), ease: "power4.inOut" }, 0)
+      .set(loader, { backgroundColor: "transparent" }, 0.3)
+      .to(half("top"), { yPercent: -100, ...curtain }, 0.3)
+      .to(half("bottom"), { yPercent: 100, ...curtain }, 0.3)
+      .to(faces[0], { y: -38, ...curtain }, 0.3)
+      .to(faces[1], { y: 38, ...curtain }, 0.3)
+      .to(under("top"), { yPercent: -100, ...curtain }, 0.38)
+      .to(under("bottom"), { yPercent: 100, ...curtain }, 0.38)
+      .call(onReveal, null, reduce ? 0 : 0.75);
 
     let counted = false;
     let ready = false;
@@ -329,25 +358,38 @@
 
     const count = () => {
       loader.classList.add("is-live");
+      gsap.to(notes, { yPercent: 0, duration: dur(0.9), ease: "expo.out", stagger: 0.06 });
       gsap.to(state, {
         value: 100,
         duration: span,
-        ease: "power4.inOut",
+        delay: dur(0.2),
+        ease: "power3.inOut",
         onUpdate: render,
         onComplete: () => {
           render();
           counted = true;
-          tryExit();
+          // The outline fills in, then the page opens.
+          if (fills.length) gsap.to(fills, { opacity: 1, duration: dur(0.45), ease: "power1.out" });
+          gsap.delayedCall(dur(fills.length ? 0.6 : 0.25), tryExit);
         },
       });
-      gsap.to(seam, { scaleX: 1, duration: span, ease: "power4.inOut" });
+      gsap.to(seam, { scaleX: 1, duration: span, delay: dur(0.2), ease: "power3.inOut" });
     };
 
-    // Start counting once the numeral font is in (or after 1.2s, whichever is first).
+    // Hold until the numeral font and the signature mask are in (max 1.6s), so
+    // the digits never swap typeface and the first stroke is never invisible.
     const numeralFont = document.fonts?.load
       ? document.fonts.load('1em "Archivo Black"', "0123456789")
       : Promise.resolve();
-    Promise.race([numeralFont, wait(1200)])
+    const maskSrc = signs.length ? $("image", signs[0])?.getAttribute("href") : null;
+    const maskImage = maskSrc
+      ? new Promise((resolve) => {
+          const probe = new Image();
+          probe.onload = probe.onerror = resolve;
+          probe.src = maskSrc;
+        })
+      : Promise.resolve();
+    Promise.race([Promise.all([numeralFont, maskImage]), wait(1600)])
       .catch(() => {})
       .then(count);
 
@@ -368,9 +410,7 @@
       });
   };
 
-  /* ------------------------------------------------------------------ */
-  /* 4a. Scroll reveals — fades, pops, word / line / char splits         */
-  /* ------------------------------------------------------------------ */
+  // //////////// SCROLL REVEALS ////////////
 
   const initReveals = () => {
     if (!hasST) return;
@@ -406,7 +446,6 @@
       gsap.set(parts, { yPercent: 115 });
 
       if (mode === "lines") {
-        // Words on the same line rise together; lines follow each other.
         ScrollTrigger.create({
           trigger: el,
           start: "top 88%",
@@ -447,7 +486,6 @@
 
     if (reduce) return;
 
-    // Paragraph that "inks in" word by word as it crosses the viewport.
     $$("[data-fade-words]").forEach((el) => {
       gsap.to($$(".sp-i", el), {
         opacity: 1,
@@ -457,7 +495,6 @@
       });
     });
 
-    // Work rows arrive as a staggered batch.
     const rows = $$("[data-work-list] > li");
     if (rows.length) {
       gsap.set(rows, { y: 46, opacity: 0 });
@@ -477,14 +514,11 @@
     }
   };
 
-  /* ------------------------------------------------------------------ */
-  /* 4b. Parallax — scrubbed, transform-only                             */
-  /* ------------------------------------------------------------------ */
+  // //////////// PARALLAX ////////////
 
   const initParallax = () => {
     if (!hasST || reduce) return;
 
-    // Image drifting inside its mask.
     $$("[data-parallax-mask]").forEach((mask) => {
       const img = $("[data-parallax-img]", mask);
       if (!img) return;
@@ -500,8 +534,6 @@
       );
     });
 
-    // Small decorations float at their own speed. The value is ±% of the
-    // element's own height; yPercent keeps clear of the reveal tween's `y`.
     $$("[data-parallax]").forEach((el) => {
       const amount = parseFloat(el.dataset.parallax) || 30;
       gsap.fromTo(
@@ -515,7 +547,6 @@
       );
     });
 
-    // Oversized type sliding sideways.
     $$("[data-drift]").forEach((el) => {
       gsap.fromTo(
         el,
@@ -528,27 +559,23 @@
       );
     });
 
-    // Contact content eases back as the footer covers it.
     const footer = $(".site-footer");
     const contactKids = $$("#contact > *");
+    // Contact only dims once the footer is genuinely covering it — "top bottom"
+    // lands the moment contact fills the screen, which dimmed it the whole time.
     if (footer && contactKids.length) {
       gsap.to(contactKids, {
         yPercent: -6,
-        opacity: 0.5,
+        opacity: 0.6,
         ease: "none",
-        scrollTrigger: { trigger: footer, start: "top bottom", end: "bottom bottom", scrub: true },
+        scrollTrigger: { trigger: footer, start: "top 62%", end: "top top", scrub: true },
       });
     }
   };
 
-  /* ------------------------------------------------------------------ */
-  /* 4c. Stats counters                                                  */
-  /* ------------------------------------------------------------------ */
+  // //////////// STATS COUNTERS ////////////
 
-  // The HTML already holds the final numbers ("3+", "12+", "7"), so the worst
-  // case — no JS, no GSAP, reduced motion — is a correct static value, never
-  // a stuck 0. An IntersectionObserver starts the count: it fires on real
-  // visibility, so it cannot be thrown off by pinned/sticky layout maths.
+  // HTML holds the final numbers, so without JS they are still correct.
   const initCounters = () => {
     const els = $$("[data-count]");
     if (!els.length || !hasGsap || reduce || !("IntersectionObserver" in window)) return;
@@ -561,7 +588,7 @@
       const state = { value: 0 };
       const render = () => (el.textContent = Math.round(state.value) + suffix);
 
-      render(); // show 0 only once we know the tween exists to move it
+      render();
 
       tweens.set(
         el,
@@ -590,9 +617,7 @@
     els.forEach((el) => io.observe(el));
   };
 
-  /* ------------------------------------------------------------------ */
-  /* 4d. Marquees — looped, velocity-reactive                            */
-  /* ------------------------------------------------------------------ */
+  // //////////// MARQUEES ////////////
 
   const initMarquees = () => {
     if (!hasGsap) return;
@@ -625,7 +650,6 @@
       );
       loops.push(loop);
 
-      // Only run while on screen.
       if (hasST) {
         ScrollTrigger.create({
           trigger: wrap,
@@ -638,19 +662,19 @@
 
     if (!loops.length || !hasST || reduce) return;
 
-    // Scroll speed and direction lean on the loops.
+    let lastScale = 1;
     ScrollTrigger.create({
       onUpdate: (self) => {
         const boost = 1 + Math.min(Math.abs(self.getVelocity()) / 2400, 2.6);
-        const scale = (self.direction || 1) * boost;
+        const scale = Math.round((self.direction || 1) * boost * 10) / 10;
+        if (scale === lastScale) return;
+        lastScale = scale;
         loops.forEach((loop) => gsap.to(loop, { timeScale: scale, duration: 0.5, overwrite: true }));
       },
     });
   };
 
-  /* ------------------------------------------------------------------ */
-  /* 4e. Certificates — pinned horizontal scroll + lightbox              */
-  /* ------------------------------------------------------------------ */
+  // //////////// CERTIFICATES ////////////
 
   const initCertificates = () => {
     const cert = $("[data-cert]");
@@ -663,7 +687,6 @@
     const countEl = $("[data-cert-count]", cert);
     const cards = $$("[data-cert-card]", cert);
 
-    // Without ScrollTrigger (or with reduced motion) it becomes a native swipe row.
     if (!hasST || reduce || !stage || !track || !viewport) {
       cert.classList.add("cert-fallback");
       return;
@@ -682,6 +705,9 @@
         scrub: 0.6,
         anticipatePin: 1,
         invalidateOnRefresh: true,
+        // Refresh before every other trigger: the pin spacer pushes everything
+        // below it down, and triggers measured first would land ~2700px early.
+        refreshPriority: 1,
         onUpdate: (self) => {
           if (rail) gsap.set(rail, { scaleX: self.progress });
           if (countEl && cards.length) {
@@ -705,7 +731,6 @@
     const count = supported ? $("[data-lightbox-count]", box) : null;
     let current = 0;
 
-    // Certificate images load only when opened, so they cost nothing up front.
     const show = (i) => {
       current = (i + cards.length) % cards.length;
       const card = cards[current];
@@ -753,9 +778,7 @@
     });
   };
 
-  /* ------------------------------------------------------------------ */
-  /* 4f. Selected work — cursor-following preview card (gsap.quickTo)    */
-  /* ------------------------------------------------------------------ */
+  // //////////// SELECTED WORK ////////////
 
   const initWorkPreview = () => {
     const list = $("[data-work-list]");
@@ -763,7 +786,6 @@
     if (!list || !preview || !canHover || reduce || !hasGsap) return;
 
     const slides = $$("[data-work-slide]", preview);
-    // quickTo reuses one tween per property: no garbage on every mousemove.
     const toX = gsap.quickTo(preview, "x", { duration: 0.55, ease: "power3" });
     const toY = gsap.quickTo(preview, "y", { duration: 0.55, ease: "power3" });
     const toTilt = gsap.quickTo(preview, "rotation", { duration: 0.7, ease: "power3" });
@@ -814,7 +836,6 @@
         pointer = { x: e.clientX, y: e.clientY };
         if (current === -1) return;
         follow(pointer.x, pointer.y, false);
-        // The card leans into the direction of travel, then settles upright.
         toTilt(gsap.utils.clamp(-12, 12, dx * 0.45));
         settle.restart(true);
       },
@@ -831,26 +852,30 @@
 
     list.addEventListener("pointerleave", hide);
 
-    // Rows move under a still cursor while scrolling: re-check what is hovered.
+    // Rows move under a still cursor while scrolling: re-check the hover.
+    let checkQueued = false;
+    const recheck = () => {
+      checkQueued = false;
+      if (!pointer) return;
+      const el = document.elementFromPoint(pointer.x, pointer.y);
+      const row = el && el.closest("[data-work]");
+      if (row && list.contains(row)) show(row, true);
+      else hide();
+    };
     addEventListener(
       "scroll",
       () => {
-        if (!pointer) return;
-        const el = document.elementFromPoint(pointer.x, pointer.y);
-        const row = el && el.closest("[data-work]");
-        if (row && list.contains(row)) show(row, true);
-        else hide();
+        if (!pointer || checkQueued) return;
+        checkQueued = true;
+        requestAnimationFrame(recheck);
       },
       { passive: true },
     );
   };
 
-  /* ------------------------------------------------------------------ */
-  /* 4g. Dock — liquid-glass nav that adapts to what is underneath       */
-  /* ------------------------------------------------------------------ */
+  // //////////// DOCK ////////////
 
-  // Position, tone and active state are plain classes + CSS transitions, so
-  // the dock keeps working even if GSAP fails to load.
+  // Plain classes + CSS transitions: works even without GSAP.
   const initDock = () => {
     const dock = $("[data-dock]");
     if (!dock) return { reveal() {} };
@@ -882,7 +907,6 @@
       placePill();
     };
 
-    // Reads the theme of whatever is painted behind the dock's resting spot.
     const readTone = () => {
       const gap = parseFloat(getComputedStyle(dock).bottom) || 18;
       const y = innerHeight - gap - dock.offsetHeight / 2;
@@ -907,7 +931,6 @@
       });
       setActive(index);
 
-      // Step aside once the contact section has arrived.
       const away = !!contact && contact.getBoundingClientRect().top <= innerHeight * 0.45;
       dock.classList.toggle("is-away", away);
     };
@@ -925,12 +948,18 @@
       queue();
     });
 
-    // Sheen follows the pointer across the glass.
     if (canHover && !reduce) {
+      let sheen = null;
       dock.addEventListener("pointermove", (e) => {
-        const r = dock.getBoundingClientRect();
-        dock.style.setProperty("--gx", `${e.clientX - r.left}px`);
-        dock.style.setProperty("--gy", `${e.clientY - r.top}px`);
+        if (!sheen) {
+          requestAnimationFrame(() => {
+            const r = dock.getBoundingClientRect();
+            dock.style.setProperty("--gx", `${sheen.x - r.left}px`);
+            dock.style.setProperty("--gy", `${sheen.y - r.top}px`);
+            sheen = null;
+          });
+        }
+        sheen = { x: e.clientX, y: e.clientY };
       });
       dock.addEventListener("pointerleave", () => {
         dock.style.removeProperty("--gx");
@@ -946,9 +975,7 @@
     };
   };
 
-  /* ------------------------------------------------------------------ */
-  /* 4h. Contact signature, magnetic button, clock, scrawl               */
-  /* ------------------------------------------------------------------ */
+  // //////////// CONTACT + FOOTER EXTRAS ////////////
 
   const initSignature = () => {
     const svg = $("[data-sign-draw]");
@@ -1042,13 +1069,10 @@
     scrawls.forEach((s) => io.observe(s));
   };
 
-  /* ------------------------------------------------------------------ */
-  /* 5. Boot                                                             */
-  /* ------------------------------------------------------------------ */
+  // //////////// BOOT ////////////
 
   const boot = () => {
-    // Always start at the top: the intro is choreographed for scroll 0, and a
-    // restored mid-page position would fire scroll reveals behind the loader.
+    // Intro is choreographed for scroll 0.
     if ("scrollRestoration" in history) history.scrollRestoration = "manual";
     scrollTo(0, 0);
 
@@ -1075,7 +1099,6 @@
 
     if (!hasST) return;
 
-    // Late layout changes (web fonts, resize) move trigger positions.
     document.fonts?.ready.then(() => ScrollTrigger.refresh());
 
     let resizeTimer = null;
