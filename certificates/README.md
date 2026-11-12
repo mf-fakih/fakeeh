@@ -1,30 +1,18 @@
-# Certificates
+# SoloLearn Certificates
 
 A collection of certificates earned through **SoloLearn**, covering web development, programming, and generative AI.
 
 ## Certificates
 
-<<<<<<< HEAD
-| Course | Issued | Certificate | Verification |
+| Course | Date Earned | Certificate | Verification |
 |---|---|---|---|
 | Introduction to HTML | 27 July 2026 | [View image](html.jpg) | [Verify](https://www.sololearn.com/certificates/CC-JNFASKDJ) |
 | Introduction to CSS | 31 July 2026 | [View image](css.jpg) | [Verify](https://www.sololearn.com/certificates/CC-ZRBN6QPO) |
-| Introduction to JavaScript | 06 November 2026 | [View image](javascript.png) | [Verify](https://www.sololearn.com/certificates/CC-4NZZNCSJ) |
 | Web Development | 05 August 2026 | [View image](web-development.jpg) | [Verify](https://www.sololearn.com/certificates/CC-WVH5PNSJ) |
+| Introduction to JavaScript | 06 November 2026 | [View image](javascript.png) | [Verify](https://www.sololearn.com/certificates/CC-4NZZNCSJ) |
 | Prompt Engineering | 06 November 2026 | [View image](prompt-engineering.jpg) | [Verify](https://www.sololearn.com/certificates/CC-L3SV56XG) |
 | Generative AI in Practice | 10 November 2026 | [View image](generative-ai-in-practice.jpg) | [Verify](https://www.sololearn.com/certificates/CC-ETB3Q1JE) |
 | Vibe Coding | 10 November 2026 | [View image](vibe-coding.jpg) | [Verify](https://www.sololearn.com/certificates/CC-I7PUXOHE) |
-=======
-| Course | Issued | Verification |
-|---|---|---|
-| [Introduction to HTML](html.jpg) | 27 July 2026 | [Verify](https://www.sololearn.com/certificates/CC-JNFASKDJ) |
-| [Introduction to CSS](css.jpg) | 31 July 2026 | [Verify](https://www.sololearn.com/certificates/CC-ZRBN6QPO) |
-| [Introduction to JavaScript](javascript.png) | 06 November 2026 | [Verify](https://www.sololearn.com/certificates/CC-4NZZNCSJ) |
-| [Web Development](web-development.jpg) | 05 August 2026 | [Verify](https://www.sololearn.com/certificates/CC-WVH5PNSJ) |
-| [Prompt Engineering](prompt-engineering.jpg) | 06 November 2026 | [Verify](https://www.sololearn.com/certificates/CC-L3SV56XG) |
-| [Generative AI in Practice](generative-ai-in-practice.jpg) | 10 November 2026 | [Verify](https://www.sololearn.com/certificates/CC-ETB3Q1JE) |
-| [Vibe Coding](vibe-coding.jpg) | 10 November 2026 | [Verify](https://www.sololearn.com/certificates/CC-I7PUXOHE) |
->>>>>>> 2ee67e1 (Add SoloLearn certificates)
 
 ## Skills & Topics
 
@@ -39,4 +27,4 @@ A collection of certificates earned through **SoloLearn**, covering web developm
 **Learner:** Muhammad Fakhril Fakih  
 **Platform:** SoloLearn
 
-Each verification link opens the corresponding SoloLearn certificate page.
+Each verification link opens the corresponding certificate page on SoloLearn.
